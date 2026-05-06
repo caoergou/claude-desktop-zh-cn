@@ -3,6 +3,7 @@ set -euo pipefail
 
 DIR="$(cd "$(dirname "$0")" && pwd)"
 PYTHON="/usr/bin/python3"
+PATCHER="$DIR/scripts/patch_claude_zh_cn.py"
 
 if [ ! -x "$PYTHON" ]; then
   PYTHON="$(command -v python3)"
@@ -16,7 +17,7 @@ if [ "$(id -u)" -ne 0 ]; then
   echo "需要管理员权限来替换 /Applications/Claude.app。"
   echo "请按提示输入这台 Mac 的登录密码。"
   echo
-  sudo "$PYTHON" "$DIR/patch_claude_zh_cn.py" --user-home "$HOME" --launch "$@"
+  sudo "$PYTHON" "$PATCHER" --user-home "$HOME" --launch "$@"
   STATUS=$?
   echo
   echo "按回车退出。"
@@ -29,7 +30,7 @@ if [ -n "${SUDO_USER:-}" ] && [ "$SUDO_USER" != "root" ]; then
   USER_HOME="/Users/$SUDO_USER"
 fi
 
-"$PYTHON" "$DIR/patch_claude_zh_cn.py" --user-home "$USER_HOME" --launch "$@"
+"$PYTHON" "$PATCHER" --user-home "$USER_HOME" --launch "$@"
 
 echo
 echo "完成。按回车退出。"

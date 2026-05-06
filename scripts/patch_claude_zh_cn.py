@@ -11,7 +11,7 @@ What it does:
 5. Moves the original app to a timestamped backup and installs the patched app.
 
 Run from this folder:
-    sudo /usr/bin/python3 patch_claude_zh_cn.py --user-home "$HOME"
+    sudo /usr/bin/python3 scripts/patch_claude_zh_cn.py --user-home "$HOME"
 """
 
 from __future__ import annotations
@@ -34,7 +34,7 @@ from typing import Any
 
 APP_DEFAULT = Path("/Applications/Claude.app")
 LANG_CODE = "zh-CN"
-ROOT = Path(__file__).resolve().parent
+ROOT = Path(__file__).resolve().parent.parent
 RESOURCES = ROOT / "resources"
 
 FRONTEND_TRANSLATION = RESOURCES / "frontend-zh-CN.json"
