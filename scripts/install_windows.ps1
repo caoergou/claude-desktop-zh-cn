@@ -13,8 +13,8 @@
 $ErrorActionPreference = "Stop"
 [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 $Utf8NoBom = [System.Text.UTF8Encoding]::new($false)
-$LanguageListPattern = '\["en-US","de-DE","fr-FR","ko-KR","ja-JP","es-419","es-ES","it-IT","hi-IN","pt-BR","id-ID"\]'
-$LanguageListReplacement = '["en-US","de-DE","fr-FR","ko-KR","ja-JP","es-419","es-ES","it-IT","hi-IN","pt-BR","id-ID","zh-CN","zh-TW","zh-HK"]'
+$BaseLanguageList = '["en-US","de-DE","fr-FR","ko-KR","ja-JP","es-419","es-ES","it-IT","hi-IN","pt-BR","id-ID"'
+$LanguageListPattern = [System.Text.RegularExpressions.Regex]::Escape($BaseLanguageList) + '(?:(?:,"zh-CN")|(?:,"zh-TW")|(?:,"zh-HK"))*\]'
 $AsarPatchTarget = ".vite/build/index.js"
 $AsarIntegrityBlockSize = 4 * 1024 * 1024
 $script:CurrentBackupSetPath = $null
@@ -23,8 +23,8 @@ function Read-InteractiveSelection {
     Write-Host "=== Claude Desktop Windows 中文补丁 ==="
     Write-Host ""
     Write-Host "[1] 安装简体中文"
-    Write-Host "[2] 安装繁体中文（台湾）"
-    Write-Host "[3] 安装繁体中文（香港）"
+    Write-Host "[2] 安装繁体中文（中国台湾）"
+    Write-Host "[3] 安装繁体中文（中国香港）"
     Write-Host "[4] 恢复原样 / 卸载补丁"
     Write-Host "[Q] 退出"
     Write-Host ""
@@ -54,8 +54,8 @@ function Get-LanguageLabel {
     param([string]$Code)
     switch ($Code) {
         "zh-CN" { return "简体中文" }
-        "zh-TW" { return "繁体中文（台湾）" }
-        "zh-HK" { return "繁体中文（香港）" }
+        "zh-TW" { return "繁体中文（中国台湾）" }
+        "zh-HK" { return "繁体中文（中国香港）" }
         default { return $Code }
     }
 }
@@ -599,7 +599,10 @@ function Sync-ClaudeExeAsarIntegrity {
 }
 
 function Register-Language {
-    param([string]$ResourcesPath)
+    param(
+        [string]$ResourcesPath,
+        [string]$Lang
+    )
 
     $assetsDir = Join-Path $ResourcesPath "ion-dist\assets\v1"
     $jsFiles = @(Get-ChildItem (Join-Path $assetsDir "index-*.js") -ErrorAction SilentlyContinue)
@@ -608,27 +611,58 @@ function Register-Language {
     }
 
     $regex = [System.Text.RegularExpressions.Regex]::new($LanguageListPattern)
+    $replacement = "$BaseLanguageList,`"$Lang`"]"
     $changed = 0
     $already = 0
     foreach ($file in $jsFiles) {
         $text = [System.IO.File]::ReadAllText($file.FullName, [System.Text.Encoding]::UTF8)
-        if ($text.Contains('"zh-CN"') -and $text.Contains('"zh-TW"') -and $text.Contains('"zh-HK"')) {
-            Write-Host "  all Chinese variants already registered: $($file.Name)" -ForegroundColor Green
+        if ($text.Contains($replacement)) {
+            Write-Host "  $Lang already registered: $($file.Name)" -ForegroundColor Green
             $already += 1
             continue
         }
 
         if ($regex.IsMatch($text)) {
-            $updated = $regex.Replace($text, $LanguageListReplacement, 1)
+            $updated = $regex.Replace($text, $replacement, 1)
             Backup-ModifiedFile $ResourcesPath $file.FullName
             [System.IO.File]::WriteAllText($file.FullName, $updated, $Utf8NoBom)
-            Write-Host "  patched language whitelist: $($file.Name)" -ForegroundColor Green
+            Write-Host "  patched language whitelist for ${Lang}: $($file.Name)" -ForegroundColor Green
             $changed += 1
         }
     }
 
     if (($changed + $already) -eq 0) {
         throw "未能注册中文语言，Claude 前端 bundle 格式可能已经变化。"
+    }
+}
+
+function Patch-LanguageDisplayNames {
+    param([string]$ResourcesPath)
+
+    $assetsDir = Join-Path $ResourcesPath "ion-dist\assets\v1"
+    $jsFiles = @(Get-ChildItem (Join-Path $assetsDir "index-*.js") -ErrorAction SilentlyContinue)
+    if ($jsFiles.Count -eq 0) {
+        throw "未找到前端 index-*.js: $assetsDir"
+    }
+
+    $marker = "__claudeZhLabelPatch"
+    $patch = ';(()=>{const e=Intl.DisplayNames&&Intl.DisplayNames.prototype;if(!e||e.__claudeZhLabelPatch)return;const n=e.of;e.of=function(e){const t=String(e);return t==="zh-CN"?"简体中文":t==="zh-HK"?"繁体中文（中国香港）":t==="zh-TW"?"繁体中文（中国台湾）":n.call(this,e)},Object.defineProperty(e,"__claudeZhLabelPatch",{value:!0})})();'
+    $patchedFiles = 0
+    foreach ($file in $jsFiles) {
+        $text = [System.IO.File]::ReadAllText($file.FullName, [System.Text.Encoding]::UTF8)
+        if ($text.Contains($marker)) {
+            Write-Host "  language display names already patched: $($file.Name)" -ForegroundColor Green
+            continue
+        }
+
+        Backup-ModifiedFile $ResourcesPath $file.FullName
+        [System.IO.File]::WriteAllText($file.FullName, ($text + $patch), $Utf8NoBom)
+        Write-Host "  patched language display names: $($file.Name)" -ForegroundColor Green
+        $patchedFiles += 1
+    }
+
+    if ($patchedFiles -eq 0) {
+        Write-Host "  no language display name changes needed" -ForegroundColor Green
     }
 }
 
@@ -937,10 +971,11 @@ function Install-WindowsLanguagePack {
     Install-LanguageFiles $resourcesPath $pack $LanguageCode
 
     Write-Step "[5/8] 注册中文语言"
-    Register-Language $resourcesPath
+    Register-Language $resourcesPath $LanguageCode
 
     Write-Step "[6/8] 汉化硬编码界面文本"
     Patch-HardcodedFrontendStrings $resourcesPath
+    Patch-LanguageDisplayNames $resourcesPath
 
     Write-Step "[7/8] 修复第三方模型名校验"
     Patch-Custom3PModelValidation $resourcesPath

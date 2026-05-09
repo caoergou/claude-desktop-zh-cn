@@ -44,8 +44,9 @@ ASAR_PATCH_TARGET = ".vite/build/index.js"
 ASAR_INTEGRITY_BLOCK_SIZE = 4 * 1024 * 1024
 
 LANG_LIST_RE = re.compile(
-    r'\["en-US","de-DE","fr-FR","ko-KR","ja-JP","es-419","es-ES","it-IT","hi-IN","pt-BR","id-ID"(.*?)\]'
+    r'\["en-US","de-DE","fr-FR","ko-KR","ja-JP","es-419","es-ES","it-IT","hi-IN","pt-BR","id-ID"(?:(?:,"zh-CN")|(?:,"zh-TW")|(?:,"zh-HK"))*\]'
 )
+BASE_LANGUAGE_LIST = '["en-US","de-DE","fr-FR","ko-KR","ja-JP","es-419","es-ES","it-IT","hi-IN","pt-BR","id-ID"'
 
 
 def get_language_config(lang_code: str) -> dict[str, Any]:
@@ -58,8 +59,8 @@ def get_language_config(lang_code: str) -> dict[str, Any]:
         "statsig_translation": RESOURCES / f"statsig-{lang_code}.json",
         "label": {
             "zh-CN": "简体中文",
-            "zh-TW": "繁体中文（台湾）",
-            "zh-HK": "繁体中文（香港）",
+            "zh-TW": "繁体中文（中国台湾）",
+            "zh-HK": "繁体中文（中国香港）",
         }.get(lang_code, lang_code),
     }
 
@@ -127,19 +128,18 @@ def copy_app(src: Path, dst: Path) -> None:
     run(["ditto", str(src), str(dst)])
 
 
-def patch_language_whitelist(app: Path) -> Path:
+def patch_language_whitelist(app: Path, lang_code: str) -> Path:
     assets_dir = app / FRONTEND_ASSETS_REL
     candidates = sorted(assets_dir.glob("index-*.js"))
     if not candidates:
         raise SystemExit(f"Cannot find frontend index bundle in {assets_dir}")
 
-    all_chinese = ['"zh-CN"', '"zh-TW"', '"zh-HK"']
-    replacement = '["en-US","de-DE","fr-FR","ko-KR","ja-JP","es-419","es-ES","it-IT","hi-IN","pt-BR","id-ID","zh-CN","zh-TW","zh-HK"]'
+    replacement = f'{BASE_LANGUAGE_LIST},"{lang_code}"]'
 
     for path in candidates:
         text = path.read_text(encoding="utf-8")
-        if all(lang in text for lang in all_chinese):
-            print(f"Language whitelist already contains all Chinese variants: {path.name}")
+        if replacement in text:
+            print(f"Language whitelist already contains {lang_code}: {path.name}")
             return path
         if LANG_LIST_RE.search(text):
             patched = LANG_LIST_RE.sub(
@@ -152,6 +152,23 @@ def patch_language_whitelist(app: Path) -> Path:
             return path
 
     raise SystemExit("Could not patch language whitelist. Claude's bundle format may have changed.")
+
+
+def patch_language_display_names(app: Path) -> None:
+    assets_dir = app / FRONTEND_ASSETS_REL
+    candidates = sorted(assets_dir.glob("index-*.js"))
+    if not candidates:
+        raise SystemExit(f"Cannot find frontend index bundle in {assets_dir}")
+
+    marker = "__claudeZhLabelPatch"
+    patch = ';(()=>{const e=Intl.DisplayNames&&Intl.DisplayNames.prototype;if(!e||e.__claudeZhLabelPatch)return;const n=e.of;e.of=function(e){const t=String(e);return t==="zh-CN"?"简体中文":t==="zh-HK"?"繁体中文（中国香港）":t==="zh-TW"?"繁体中文（中国台湾）":n.call(this,e)},Object.defineProperty(e,"__claudeZhLabelPatch",{value:!0})})();'
+    for path in candidates:
+        text = path.read_text(encoding="utf-8")
+        if marker in text:
+            print(f"Language display names already patched: {path.name}")
+            continue
+        path.write_text(text + patch, encoding="utf-8")
+        print(f"Patched language display names: {path.name}")
 
 
 def patch_hardcoded_frontend_strings(app: Path) -> None:
@@ -733,8 +750,9 @@ def main() -> int:
     patched_app = tmp_root / "Claude.app"
 
     copy_app(args.app, patched_app)
-    patch_language_whitelist(patched_app)
+    patch_language_whitelist(patched_app, lang_code)
     patch_hardcoded_frontend_strings(patched_app)
+    patch_language_display_names(patched_app)
     patch_custom3p_model_validation(patched_app)
     merge_frontend_locale(patched_app, lang_code)
     install_desktop_locale(patched_app, lang_code)

@@ -1,6 +1,6 @@
 # Claude Desktop 中文补丁
 
-一个用于 Claude Desktop 的中文界面补丁，支持简体中文、繁体中文（台湾）和繁体中文（香港）。
+一个用于 Claude Desktop 的中文界面补丁，支持简体中文、繁体中文（中国台湾）和繁体中文（中国香港）。
 
 macOS 可双击 `install-mac.command`，Windows 可右键管理员运行 `install-windows.bat`，给 Claude Desktop 添加中文语言选项，并安装中文界面资源。
 
@@ -9,8 +9,8 @@ macOS 可双击 `install-mac.command`，Windows 可右键管理员运行 `instal
 ## 功能特点
 
 - 一键安装 Claude Desktop 中文界面资源，支持 macOS 和 Windows。
-- 支持三种中文变体：`zh-CN`（简体中文）、`zh-TW`（繁体中文（台湾））、`zh-HK`（繁体中文（香港））。
-- 自动给 Claude 前端语言白名单加入所有中文变体。
+- 支持三种中文变体：`zh-CN`（简体中文）、`zh-TW`（繁体中文（中国台湾））、`zh-HK`（繁体中文（中国香港））。
+- 自动给 Claude 前端语言白名单加入当前选择的中文变体。
 - macOS 自动合并当前 Claude 版本的英文语言文件与随包中文翻译。
 - 新版本新增但暂未翻译的字段会保留英文，避免界面缺失文本。
 - macOS 和 Windows 自动绕过新版 Claude Desktop 对 3P gateway 模型名的本地 Anthropic 校验，避免 `deepseek-v4-pro` / `kimi-*` 等模型名导致配置整体失效。
@@ -31,7 +31,7 @@ macOS 可双击 `install-mac.command`，Windows 可右键管理员运行 `instal
 1. 退出 Claude Desktop。
 2. 下载或克隆本项目。
 3. 双击 `install-mac.command`。
-4. 选择要安装的语言（1=简体中文，2=繁体中文（台湾），3=繁体中文（香港））。
+4. 选择要安装的语言（1=简体中文，2=繁体中文（中国台湾），3=繁体中文（中国香港））。
 5. 按提示输入 Mac 登录密码。
 6. Claude 会自动重新打开。
 7. 如果没有自动切换，打开左下角账号菜单，选择 `Language` -> 对应的中文选项。
@@ -42,9 +42,9 @@ macOS 可双击 `install-mac.command`，Windows 可右键管理员运行 `instal
 cd /path/to/claude-desktop-zh-cn
 # 简体中文
 sudo /usr/bin/python3 scripts/patch_claude_zh_cn.py --user-home "$HOME" --lang zh-CN --launch
-# 繁体中文（台湾）
+# 繁体中文（中国台湾）
 sudo /usr/bin/python3 scripts/patch_claude_zh_cn.py --user-home "$HOME" --lang zh-TW --launch
-# 繁体中文（香港）
+# 繁体中文（中国香港）
 sudo /usr/bin/python3 scripts/patch_claude_zh_cn.py --user-home "$HOME" --lang zh-HK --launch
 ```
 
@@ -55,8 +55,8 @@ sudo /usr/bin/python3 scripts/patch_claude_zh_cn.py --user-home "$HOME" --lang z
 3. 右键 `install-windows.bat`，选择以管理员身份运行。
 4. 在菜单中选择语言：
    - `1` 简体中文
-   - `2` 繁体中文（台湾）
-   - `3` 繁体中文（香港）
+   - `2` 繁体中文（中国台湾）
+   - `3` 繁体中文（中国香港）
    - `4` 卸载补丁
 5. 脚本会写入本仓库 `resources` 目录里的中文 JSON，补齐硬编码界面文本，修复 3P gateway 模型名校验，并重启 Claude Desktop。
 6. 如果没有自动切换，打开左下角账号菜单，选择 `Language` -> 对应的中文选项。
@@ -67,9 +67,9 @@ sudo /usr/bin/python3 scripts/patch_claude_zh_cn.py --user-home "$HOME" --lang z
 cd path\to\claude-desktop-zh-cn
 # 简体中文
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install_windows.ps1 install zh-CN
-# 繁体中文（台湾）
+# 繁体中文（中国台湾）
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install_windows.ps1 install zh-TW
-# 繁体中文（香港）
+# 繁体中文（中国香港）
 powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install_windows.ps1 install zh-HK
 ```
 
@@ -105,7 +105,7 @@ chmod +x install-mac.command
 - 备份当前 `/Applications/Claude.app` 到同目录，名字类似：
   `Claude.backup-before-zh-CN-20260424-120000.app`
 - 复制 Claude.app 到临时目录并打补丁。
-- 给前端语言白名单加入 `zh-CN`、`zh-TW`、`zh-HK`。
+- 给前端语言白名单加入当前选择的中文变体。
 - 对 `Contents/Resources/app.asar` 做等长补丁，关闭 3P gateway 启动阶段的 `inferenceModels` Anthropic 名称校验。
 - 合并当前 Claude 版本的 `en-US.json` 和随包中文翻译：
   当前版本已有中文翻译的 key 会变中文，新版本新增但本包没有的 key 会保留英文，避免应用缺字段。
@@ -121,7 +121,7 @@ chmod +x install-mac.command
   - `resources/frontend-zh-CN.json` / `frontend-zh-TW.json` / `frontend-zh-HK.json` -> `ion-dist\i18n\` 对应语言代码 `.json`
   - `resources/desktop-zh-CN.json` / `desktop-zh-TW.json` / `desktop-zh-HK.json` -> `resources\` 对应语言代码 `.json`
   - `resources/statsig-zh-CN.json` / `statsig-zh-TW.json` / `statsig-zh-HK.json` -> `ion-dist\i18n\statsig\` 对应语言代码 `.json`
-- 给前端语言白名单加入 `zh-CN`、`zh-TW`、`zh-HK`。
+- 给前端语言白名单加入当前选择的中文变体。
 - 汉化前端 bundle 中未走 i18n JSON 的硬编码界面文本，例如侧边栏入口、配置页标签和模型选择项。
 - 对 `resources\app.asar` 做等长补丁，关闭 3P gateway 启动阶段的 `inferenceModels` Anthropic 名称校验，并同步更新 asar 内部文件完整性信息和 `Claude.exe` 内嵌的 asar header hash。
 - 写入 Windows 用户配置，将语言设置为所选语言代码（`zh-CN`、`zh-TW` 或 `zh-HK`）。
