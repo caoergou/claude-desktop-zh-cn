@@ -43,22 +43,6 @@ macOS 可双击 `install-mac.command`，Windows 可右键管理员运行 `instal
 6. Claude 会自动重新打开。
 7. 如果没有自动切换，打开左下角账号菜单，选择 `Language` -> 对应的中文选项。
 
-也可以在终端运行：
-
-```bash
-cd /path/to/claude-desktop-zh-cn
-# 简体中文
-sudo /usr/bin/python3 scripts/patch_claude_zh_cn.py --user-home "$HOME" --lang zh-CN --launch
-# 繁体中文（中国台湾）
-sudo /usr/bin/python3 scripts/patch_claude_zh_cn.py --user-home "$HOME" --lang zh-TW --launch
-# 繁体中文（中国香港）
-sudo /usr/bin/python3 scripts/patch_claude_zh_cn.py --user-home "$HOME" --lang zh-HK --launch
-# 安全模式：选择任意中文语言，并跳过 app.asar 补丁
-sudo /usr/bin/python3 scripts/patch_claude_zh_cn.py --user-home "$HOME" --lang zh-CN --launch --skip-asar-patch
-# 恢复原样 / 卸载补丁
-sudo /usr/bin/python3 scripts/patch_claude_zh_cn.py --user-home "$HOME" --restore --launch
-```
-
 ### Windows
 
 1. 退出 Claude Desktop。
@@ -75,34 +59,6 @@ sudo /usr/bin/python3 scripts/patch_claude_zh_cn.py --user-home "$HOME" --restor
 6. 脚本会写入本仓库 `resources` 目录里的中文 JSON，补齐硬编码界面文本；非安全模式会修复 3P gateway 模型名校验，并重启 Claude Desktop。
 7. 如果没有自动切换，打开左下角账号菜单，选择 `Language` -> 对应的中文选项。
 
-也可以在 PowerShell 中运行：
-
-```powershell
-cd path\to\claude-desktop-zh-cn
-# 简体中文
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install_windows.ps1 install zh-CN
-# 繁体中文（中国台湾）
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install_windows.ps1 install zh-TW
-# 繁体中文（中国香港）
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install_windows.ps1 install zh-HK
-# 安全模式：选择任意中文语言，并跳过 app.asar 补丁
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\install_windows.ps1 -SkipAsarPatch install zh-CN
-```
-
-## 从 GitHub 下载
-
-```bash
-git clone https://github.com/<your-name>/claude-desktop-zh-cn.git
-cd claude-desktop-zh-cn
-./install-mac.command
-```
-
-如果 `install-mac.command` 无法双击运行，可以先执行：
-
-```bash
-chmod +x install-mac.command
-./install-mac.command
-```
 
 ## 文件说明
 
