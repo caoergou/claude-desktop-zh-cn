@@ -745,6 +745,7 @@ function Replace-AsarFileContent {
     $asarPath = Join-Path $ResourcesPath "app.asar"
     Require-File $asarPath
 
+    Write-Host "  reading app.asar: $FilePath" -ForegroundColor DarkGray
     $data = [System.IO.File]::ReadAllBytes($asarPath)
     $parsed = Read-AsarHeader $data $asarPath
     $headerSize = $parsed["HeaderSize"]
@@ -760,6 +761,7 @@ function Replace-AsarFileContent {
 
     $oldContent = [byte[]]::new([int]$contentSize)
     [System.Array]::Copy($data, [int]$contentOffset, $oldContent, 0, [int]$contentSize)
+    Write-Host "  checking app.asar target content: $([Math]::Round($contentSize / 1MB, 1)) MB" -ForegroundColor DarkGray
     $contentMatches = $oldContent.Length -eq $PatchedContent.Length
     if ($contentMatches) {
         for ($i = 0; $i -lt $oldContent.Length; $i++) {
@@ -775,6 +777,7 @@ function Replace-AsarFileContent {
 
     $targetOffset = [int64]$entry.offset
     $delta = [int64]$PatchedContent.Length - $contentSize
+    Write-Host "  rebuilding app.asar content: delta=$delta bytes" -ForegroundColor DarkGray
     $entry.size = $PatchedContent.Length
     $entry.integrity = Get-AsarFileIntegrity $PatchedContent
     if ($delta -ne 0) {
@@ -792,6 +795,7 @@ function Replace-AsarFileContent {
     $tailOffset = [int]$contentEnd
     $body.Write($data, $tailOffset, $data.Length - $tailOffset)
 
+    Write-Host "  serializing app.asar header" -ForegroundColor DarkGray
     $updatedHeaderString = $header | ConvertTo-Json -Compress -Depth 100
     $updatedHeader = Encode-AsarHeaderDynamic $updatedHeaderString
     $updatedBody = $body.ToArray()
@@ -800,7 +804,9 @@ function Replace-AsarFileContent {
     [System.Array]::Copy($updatedBody, 0, $updated, $updatedHeader.Length, $updatedBody.Length)
 
     Backup-ModifiedFile $ResourcesPath $asarPath
+    Write-Host "  writing app.asar: $([Math]::Round($updated.Length / 1MB, 1)) MB" -ForegroundColor DarkGray
     [System.IO.File]::WriteAllBytes($asarPath, $updated)
+    Write-Host "  syncing Claude.exe app.asar integrity" -ForegroundColor DarkGray
     Sync-ClaudeExeAsarIntegrity $ResourcesPath
     return $true
 }
@@ -1232,10 +1238,12 @@ function Get-OnlineTranslationMap {
     Require-File $enPath
     Require-File $Pack["Frontend"]
 
+    Write-Host "  loading online DOM translation sources" -ForegroundColor DarkGray
     $en = Get-Content $enPath -Raw -Encoding UTF8 | ConvertFrom-Json
     $zh = Get-Content $Pack["Frontend"] -Raw -Encoding UTF8 | ConvertFrom-Json
     $mapping = [ordered]@{}
 
+    Write-Host "  collecting frontend i18n DOM strings" -ForegroundColor DarkGray
     foreach ($property in $en.PSObject.Properties) {
         $source = [string]$property.Value
         $targetProperty = $zh.PSObject.Properties[$property.Name]
@@ -1247,6 +1255,7 @@ function Get-OnlineTranslationMap {
         }
     }
 
+    Write-Host "  merging hardcoded DOM strings" -ForegroundColor DarkGray
     foreach ($pair in @(Get-FrontendHardcodedReplacements $Language)) {
         $source = $pair[0]
         $target = $pair[1]
@@ -1255,6 +1264,7 @@ function Get-OnlineTranslationMap {
         }
     }
 
+    Write-Host "  prepared online DOM translation map: $($mapping.Count) strings" -ForegroundColor DarkGray
     return $mapping
 }
 
@@ -1264,6 +1274,7 @@ function Get-OnlineDomTranslationScript {
         [object]$Mapping
     )
 
+    Write-Host "  serializing online DOM translation script" -ForegroundColor DarkGray
     $mappingJson = $Mapping | ConvertTo-Json -Compress -Depth 100
     $languageJson = $Language | ConvertTo-Json -Compress
     $template = @'
@@ -1282,6 +1293,7 @@ function Patch-OnlineDomTranslation {
     $asarPath = Join-Path $ResourcesPath "app.asar"
     Require-File $asarPath
 
+    Write-Host "  preparing online claude.ai DOM translation patch" -ForegroundColor DarkGray
     $data = [System.IO.File]::ReadAllBytes($asarPath)
     $parsed = Read-AsarHeader $data $asarPath
     $headerSize = $parsed["HeaderSize"]
@@ -1297,6 +1309,7 @@ function Patch-OnlineDomTranslation {
 
     $content = [byte[]]::new([int]$contentSize)
     [System.Array]::Copy($data, [int]$contentOffset, $content, 0, [int]$contentSize)
+    Write-Host "  loaded main-process bundle: $([Math]::Round($contentSize / 1MB, 1)) MB" -ForegroundColor DarkGray
     $text = [System.Text.Encoding]::UTF8.GetString($content)
     $existingPattern = '(?<receiver>[A-Za-z_$][A-Za-z0-9_$]*)\.webContents\.on\("dom-ready",\(\)=>\{(?<body>(?:(?!\k<receiver>\.webContents\.executeJavaScript).)*);?\k<receiver>\.webContents\.executeJavaScript\("(?:\\.|[^"\\])*"\)\.catch\(\(\)=>\{\}\)\}\);/\*' + [System.Text.RegularExpressions.Regex]::Escape($OnlineLocaleMainMarker) + '\*/'
     $hadExisting = [System.Text.RegularExpressions.Regex]::IsMatch($text, $existingPattern)
@@ -1308,6 +1321,7 @@ function Patch-OnlineDomTranslation {
     $script = Get-OnlineDomTranslationScript $Language $mapping
     $scriptLiteral = $script | ConvertTo-Json -Compress
 
+    Write-Host "  locating online DOM translation injection point" -ForegroundColor DarkGray
     $hookPattern = '(?<receiver>[A-Za-z_$][A-Za-z0-9_$]*)\.webContents\.on\("dom-ready",\(\)=>\{(?<body>[^{}]*"main_view_dom_ready"[^{}]*)\}\);'
     $hookMatch = [System.Text.RegularExpressions.Regex]::Match($text, $hookPattern)
     if ($hookMatch.Success) {
@@ -1320,6 +1334,7 @@ function Patch-OnlineDomTranslation {
             return
         }
 
+        Write-Host "  injecting online DOM translation hook" -ForegroundColor DarkGray
         $patched = $text.Substring(0, $hookMatch.Index) + $injection + $text.Substring($hookMatch.Index + $hookMatch.Length)
         $patchedContent = [System.Text.Encoding]::UTF8.GetBytes($patched)
         [void](Replace-AsarFileContent $ResourcesPath $AsarPatchTarget $patchedContent)
@@ -1341,6 +1356,7 @@ function Patch-OnlineDomTranslation {
     }
 
     $anchorIndex = $text.IndexOf($legacyAnchor, [System.StringComparison]::Ordinal)
+    Write-Host "  injecting legacy online DOM translation hook" -ForegroundColor DarkGray
     $patched = $text.Substring(0, $anchorIndex) + $injection + $text.Substring($anchorIndex + $legacyAnchor.Length)
     $patchedContent = [System.Text.Encoding]::UTF8.GetBytes($patched)
     [void](Replace-AsarFileContent $ResourcesPath $AsarPatchTarget $patchedContent)
