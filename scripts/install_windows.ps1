@@ -5,7 +5,7 @@
     [string]$PatchMode = "full",
 
     [Parameter(Position = 0)]
-    [ValidateSet("install", "uninstall")]
+    [ValidateSet("install", "uninstall", "disable-updates", "enable-updates")]
     [string]$Action = "install",
 
     [Parameter(Position = 1)]
@@ -118,6 +118,8 @@ function Read-InteractiveSelection {
     Write-Host "[2] 安装中文补丁(官方账号登录方式：Cowork 沙箱/工作区不可用)"
     Write-Host "[3] 安装中文补丁(第三方 API 登录方式：同时去除模型限制；Cowork 沙箱/工作区不可用)"
     Write-Host "[4] 恢复原样 / 卸载补丁"
+    Write-Host "[5] 禁止自动更新"
+    Write-Host "[6] 允许自动更新"
     Write-Host "[Q] 退出"
     Write-Host ""
 
@@ -130,8 +132,10 @@ function Read-InteractiveSelection {
             '^[2]$' { $patchModeForInstall = "official"; $actionSelected = $true }
             '^[3]$' { $patchModeForInstall = "full"; $actionSelected = $true }
             '^[4]$' { return @{ Action = "uninstall"; Language = "zh-CN"; PatchMode = "safe" } }
+            '^[5]$' { return @{ Action = "disable-updates"; Language = "zh-CN"; PatchMode = "safe" } }
+            '^[6]$' { return @{ Action = "enable-updates"; Language = "zh-CN"; PatchMode = "safe" } }
             '^[Qq]$' { exit 0 }
-            default { Write-Host "请输入 1、2、3、4 或 Q。" -ForegroundColor Yellow }
+            default { Write-Host "请输入 1、2、3、4、5、6 或 Q。" -ForegroundColor Yellow }
         }
     }
 
@@ -2099,18 +2103,166 @@ function Set-ClaudeLocale {
     }
 }
 
+function Get-ThirdPartyConfigLibraryPaths {
+    $paths = @()
+    if ($env:APPDATA) {
+        $paths += Join-Path $env:APPDATA "Claude-3p\configLibrary"
+    }
+
+    if ($env:LOCALAPPDATA) {
+        $packageRoot = Join-Path $env:LOCALAPPDATA "Packages"
+        $packageDirs = @(Get-ChildItem (Join-Path $packageRoot "Claude_*") -Directory -ErrorAction SilentlyContinue |
+            Sort-Object LastWriteTime -Descending)
+        foreach ($packageDir in $packageDirs) {
+            $paths += Join-Path $packageDir.FullName "LocalCache\Roaming\Claude-3p\configLibrary"
+        }
+    }
+
+    return @($paths | Select-Object -Unique)
+}
+
+function Get-JsonObjectOrBackup {
+    param([string]$Path)
+
+    if (-not (Test-Path $Path -PathType Leaf)) {
+        return [pscustomobject]@{}
+    }
+
+    try {
+        $loaded = Get-Content $Path -Raw | ConvertFrom-Json
+        if ($loaded -is [pscustomobject]) {
+            return $loaded
+        }
+        throw "JSON root is not an object."
+    }
+    catch {
+        $backup = "$Path.bak-invalid"
+        Copy-Item $Path $backup -Force
+        return [pscustomobject]@{}
+    }
+}
+
+function Add-OrSetJsonProperty {
+    param(
+        [pscustomobject]$Object,
+        [string]$Name,
+        [object]$Value
+    )
+
+    $Object | Add-Member -NotePropertyName $Name -NotePropertyValue $Value -Force
+}
+
+function Ensure-ConfigLibraryEntry {
+    param(
+        [pscustomobject]$Meta,
+        [string]$ConfigId
+    )
+
+    Add-OrSetJsonProperty $Meta "appliedId" $ConfigId
+
+    $entries = @()
+    if ($Meta.PSObject.Properties.Name -contains "entries" -and $Meta.entries) {
+        $entries = @($Meta.entries)
+    }
+
+    foreach ($entry in $entries) {
+        if ($entry -is [pscustomobject] -and [string]$entry.id -eq $ConfigId) {
+            Add-OrSetJsonProperty $Meta "entries" $entries
+            return
+        }
+    }
+
+    $entries += [pscustomobject]@{ id = $ConfigId; name = "Default" }
+    Add-OrSetJsonProperty $Meta "entries" $entries
+}
+
+function Set-ThirdPartyAutoUpdates {
+    param([bool]$Enabled)
+
+    $libraryPaths = @(Get-ThirdPartyConfigLibraryPaths)
+    $existingMetaPaths = @()
+    foreach ($configLibrary in $libraryPaths) {
+        $metaPath = Join-Path $configLibrary "_meta.json"
+        if (Test-Path $metaPath -PathType Leaf) {
+            $existingMetaPaths += $configLibrary
+        }
+    }
+
+    if ($existingMetaPaths.Count -gt 0) {
+        $libraryPaths = $existingMetaPaths
+    } else {
+        $existingLibraryPaths = @()
+        foreach ($configLibrary in $libraryPaths) {
+            if (Test-Path $configLibrary -PathType Container) {
+                $existingLibraryPaths += $configLibrary
+            }
+        }
+
+        if ($existingLibraryPaths.Count -gt 0) {
+            $libraryPaths = $existingLibraryPaths
+        } elseif ($env:APPDATA) {
+            $libraryPaths = @(Join-Path $env:APPDATA "Claude-3p\configLibrary")
+        } elseif ($env:LOCALAPPDATA) {
+            $libraryPaths = @(Join-Path $env:LOCALAPPDATA "Claude-3p\configLibrary")
+        } else {
+            Write-Host "  [警告] APPDATA 和 LOCALAPPDATA 均未设置，无法写入 Claude-3p 自动更新配置。" -ForegroundColor DarkYellow
+            return
+        }
+    }
+
+    $updatedCount = 0
+    foreach ($configLibrary in $libraryPaths) {
+        $metaPath = Join-Path $configLibrary "_meta.json"
+        $creatingLibrary = -not (Test-Path $metaPath -PathType Leaf)
+
+        $meta = Get-JsonObjectOrBackup $metaPath
+        $configId = ""
+        if ($meta.PSObject.Properties.Name -contains "appliedId") {
+            $configId = ([string]$meta.appliedId).Trim()
+        }
+
+        if (-not $configId) {
+            $existingConfigs = @(Get-ChildItem $configLibrary -Filter "*.json" -File -ErrorAction SilentlyContinue |
+                Where-Object { $_.Name -ne "_meta.json" } |
+                Sort-Object Name)
+            if ($existingConfigs.Count -gt 0) {
+                $configId = [System.IO.Path]::GetFileNameWithoutExtension($existingConfigs[0].Name)
+            } else {
+                $configId = [guid]::NewGuid().ToString()
+            }
+        }
+
+        $configPath = Join-Path $configLibrary "$configId.json"
+        $config = Get-JsonObjectOrBackup $configPath
+        Add-OrSetJsonProperty $config "disableAutoUpdates" (-not $Enabled)
+        Ensure-ConfigLibraryEntry $meta $configId
+
+        New-Item -ItemType Directory -Path $configLibrary -Force | Out-Null
+        $config | ConvertTo-Json -Depth 20 | Set-Content $configPath -Encoding UTF8
+        $meta | ConvertTo-Json -Depth 20 | Set-Content $metaPath -Encoding UTF8
+
+        $updatedCount++
+    }
+
+    if ($Enabled) {
+        Write-Host "允许更新成功" -ForegroundColor Green
+    } else {
+        Write-Host "禁止更新成功" -ForegroundColor Green
+    }
+}
+
 function Test-ThirdPartyApiConfigExists {
-    if (-not $env:LOCALAPPDATA) {
-        return $false
-    }
+    foreach ($configLibrary in @(Get-ThirdPartyConfigLibraryPaths)) {
+        if (-not (Test-Path $configLibrary -PathType Container)) {
+            continue
+        }
 
-    $configLibrary = Join-Path $env:LOCALAPPDATA "Claude-3p\configLibrary"
-    if (-not (Test-Path $configLibrary -PathType Container)) {
-        return $false
+        $entries = @(Get-ChildItem $configLibrary -Force -ErrorAction SilentlyContinue | Select-Object -First 1)
+        if ($entries.Count -gt 0) {
+            return $true
+        }
     }
-
-    $entries = @(Get-ChildItem $configLibrary -Force -ErrorAction SilentlyContinue | Select-Object -First 1)
-    return $entries.Count -gt 0
+    return $false
 }
 
 function Confirm-InstallWithoutThirdPartyApiConfig {
@@ -2293,6 +2445,8 @@ try {
     switch ($Action) {
         "install" { Install-WindowsLanguagePack }
         "uninstall" { Uninstall-WindowsLanguagePack }
+        "disable-updates" { Set-ThirdPartyAutoUpdates $false }
+        "enable-updates" { Set-ThirdPartyAutoUpdates $true }
     }
 
     Stop-InstallLog

@@ -29,6 +29,7 @@ import struct
 import sys
 import tempfile
 import time
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -1267,6 +1268,76 @@ def set_user_locale(user_home: Path, lang_code: str) -> None:
     print(f"Set Claude config locale: {config}")
 
 
+def chown_to_sudo_user(path: Path) -> None:
+    sudo_uid = os.environ.get("SUDO_UID")
+    sudo_gid = os.environ.get("SUDO_GID")
+    if sudo_uid and sudo_gid and path.exists():
+        os.chown(path, int(sudo_uid), int(sudo_gid))
+
+
+def load_json_object_or_backup(path: Path, dry_run: bool = False) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    try:
+        data = load_json(path)
+        if isinstance(data, dict):
+            return data
+        raise ValueError("JSON root is not an object")
+    except Exception:
+        backup = path.with_suffix(path.suffix + ".bak-invalid")
+        if dry_run:
+            print(f"[dry-run] Existing config is not valid JSON; would back up to {backup}")
+        else:
+            shutil.copy2(path, backup)
+        return {}
+
+
+def ensure_config_library_entry(meta: dict[str, Any], config_id: str) -> None:
+    meta["appliedId"] = config_id
+    entries = meta.get("entries")
+    if not isinstance(entries, list):
+        entries = []
+        meta["entries"] = entries
+    for entry in entries:
+        if isinstance(entry, dict) and entry.get("id") == config_id:
+            return
+    entries.append({"id": config_id, "name": "Default"})
+
+
+def set_third_party_auto_updates(user_home: Path, enabled: bool, dry_run: bool = False) -> bool:
+    config_library = user_home / "Library/Application Support/Claude-3p/configLibrary"
+    meta_path = config_library / "_meta.json"
+    creating_library = not meta_path.exists()
+    meta = load_json_object_or_backup(meta_path, dry_run=dry_run)
+    applied_id = meta.get("appliedId")
+    config_id = str(applied_id) if isinstance(applied_id, str) and applied_id.strip() else ""
+
+    if not config_id:
+        existing_configs = sorted(
+            path for path in config_library.glob("*.json") if path.name != "_meta.json"
+        )
+        config_id = existing_configs[0].stem if existing_configs else str(uuid.uuid4())
+
+    config_path = config_library / f"{config_id}.json"
+    config = load_json_object_or_backup(config_path, dry_run=dry_run)
+    config["disableAutoUpdates"] = not enabled
+    ensure_config_library_entry(meta, config_id)
+
+    state = "允许" if enabled else "禁止"
+    if dry_run:
+        action = "create and update" if creating_library else "update"
+        print(f"[dry-run] Would {action} Claude-3p config and {state}自动更新: {config_path}")
+        return True
+
+    save_json(config_path, config)
+    save_json(meta_path, meta)
+    chown_to_sudo_user(config_path)
+    chown_to_sudo_user(meta_path)
+
+    print("允许更新成功" if enabled else "禁止更新成功")
+    return True
+
+
 def has_third_party_api_config(user_home: Path) -> bool:
     config_library = user_home / "Library/Application Support/Claude-3p/configLibrary"
     if not config_library.is_dir():
@@ -1393,7 +1464,20 @@ def main() -> int:
     parser.add_argument("--launch", action="store_true", help="Launch Claude after installation")
     parser.add_argument("--restore", action="store_true", help="Restore the oldest macOS app backup and delete other backups")
     parser.add_argument("--skip-asar-patch", action="store_true", help="Skip app.asar and binary integrity patches (safe mode)")
+    parser.add_argument(
+        "--set-auto-updates",
+        choices=["enabled", "disabled"],
+        help="Only update Claude-3p auto-update setting, then exit",
+    )
     args = parser.parse_args()
+
+    if args.set_auto_updates:
+        set_third_party_auto_updates(
+            args.user_home,
+            enabled=args.set_auto_updates == "enabled",
+            dry_run=args.dry_run,
+        )
+        return 0
 
     try:
         in_applications = args.app.resolve().as_posix().startswith("/Applications/")
