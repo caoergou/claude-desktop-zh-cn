@@ -5,7 +5,7 @@
     [string]$PatchMode = "full",
 
     [Parameter(Position = 0)]
-    [ValidateSet("install", "uninstall", "disable-updates", "enable-updates")]
+    [ValidateSet("install", "uninstall", "disable-updates", "enable-updates", "sync-skills", "unsync-skills")]
     [string]$Action = "install",
 
     [Parameter(Position = 1)]
@@ -118,22 +118,42 @@ function Read-InteractiveSelection {
     Write-Host "[2] 安装中文补丁(官方账号登录方式：Cowork 沙箱/工作区不可用)"
     Write-Host "[3] 安装中文补丁(第三方 API 登录方式：同时去除模型限制；Cowork 沙箱/工作区不可用)"
     Write-Host "[4] 恢复原样 / 卸载补丁"
-    Write-Host "[5] 禁止自动更新"
-    Write-Host "[6] 允许自动更新"
+    Write-Host "[5] 自动更新设置（y=开启自动更新，n=停止自动更新）"
+    Write-Host "[6] 同步 CC Switch skills（y=开启同步，n=删除同步）"
     Write-Host "[Q] 退出"
     Write-Host ""
 
     $patchModeForInstall = "full"
     $actionSelected = $false
     while (-not $actionSelected) {
-        $actionSelection = (Read-Host "请选择操作 [1/2/3/4/Q]").Trim()
+        $actionSelection = (Read-Host "请选择操作 [1/2/3/4/5/6/Q]").Trim()
         switch -Regex ($actionSelection) {
             '^[1]$' { $patchModeForInstall = "safe"; $actionSelected = $true }
             '^[2]$' { $patchModeForInstall = "official"; $actionSelected = $true }
             '^[3]$' { $patchModeForInstall = "full"; $actionSelected = $true }
             '^[4]$' { return @{ Action = "uninstall"; Language = "zh-CN"; PatchMode = "safe" } }
-            '^[5]$' { return @{ Action = "disable-updates"; Language = "zh-CN"; PatchMode = "safe" } }
-            '^[6]$' { return @{ Action = "enable-updates"; Language = "zh-CN"; PatchMode = "safe" } }
+            '^[5]$' {
+                $updateChoice = (Read-Host "是否开启自动更新？[y=开启自动更新 / n=停止自动更新]").Trim()
+                switch -Regex ($updateChoice) {
+                    '^[Yy]$' { return @{ Action = "enable-updates"; Language = "zh-CN"; PatchMode = "safe" } }
+                    '^[Nn]$' { return @{ Action = "disable-updates"; Language = "zh-CN"; PatchMode = "safe" } }
+                    default {
+                        Write-Host "无效输入，请输入 y 开启自动更新，或输入 n 停止自动更新。" -ForegroundColor Yellow
+                        continue
+                    }
+                }
+            }
+            '^[6]$' {
+                $skillsChoice = (Read-Host "是否同步 CC Switch skills？[y=开启同步 / n=删除同步]").Trim()
+                switch -Regex ($skillsChoice) {
+                    '^[Yy]$' { return @{ Action = "sync-skills"; Language = "zh-CN"; PatchMode = "safe" } }
+                    '^[Nn]$' { return @{ Action = "unsync-skills"; Language = "zh-CN"; PatchMode = "safe" } }
+                    default {
+                        Write-Host "无效输入，请输入 y 开启同步，或输入 n 删除同步。" -ForegroundColor Yellow
+                        continue
+                    }
+                }
+            }
             '^[Qq]$' { exit 0 }
             default { Write-Host "请输入 1、2、3、4、5、6 或 Q。" -ForegroundColor Yellow }
         }
@@ -2202,6 +2222,17 @@ function Get-JsonObjectOrBackup {
     }
 }
 
+function Save-JsonNoBom {
+    param(
+        [string]$Path,
+        [object]$Value,
+        [int]$Depth = 20
+    )
+
+    $json = $Value | ConvertTo-Json -Depth $Depth
+    [System.IO.File]::WriteAllText($Path, $json, $Utf8NoBom)
+}
+
 function Add-OrSetJsonProperty {
     param(
         [pscustomobject]$Object,
@@ -2308,6 +2339,369 @@ function Set-ThirdPartyAutoUpdates {
         Write-Host "允许更新成功" -ForegroundColor Green
     } else {
         Write-Host "禁止更新成功" -ForegroundColor Green
+    }
+}
+
+function Get-CCSwitchSkillsDirectory {
+    $userProfile = $env:USERPROFILE
+    if (-not $userProfile) {
+        $userProfile = [Environment]::GetFolderPath("UserProfile")
+    }
+    if (-not $userProfile) {
+        throw "无法确定当前用户目录，无法定位 CC Switch skills。"
+    }
+
+    return Join-Path $userProfile ".cc-switch\skills"
+}
+
+function Get-ClaudeSkillsPluginBasePaths {
+    $paths = @()
+    if ($env:LOCALAPPDATA) {
+        $paths += Join-Path $env:LOCALAPPDATA "Claude-3p\local-agent-mode-sessions\skills-plugin"
+    }
+    if ($env:APPDATA) {
+        $paths += Join-Path $env:APPDATA "Claude-3p\local-agent-mode-sessions\skills-plugin"
+    }
+
+    return @($paths | Where-Object { $_ } | Select-Object -Unique)
+}
+
+function Find-ClaudeDesktopSkillsPluginRoot {
+    $candidates = @()
+    foreach ($base in Get-ClaudeSkillsPluginBasePaths) {
+        if (-not (Test-Path -LiteralPath $base -PathType Container)) {
+            continue
+        }
+
+        foreach ($orgDir in Get-ChildItem -LiteralPath $base -Directory -ErrorAction SilentlyContinue) {
+            foreach ($pluginDir in Get-ChildItem -LiteralPath $orgDir.FullName -Directory -ErrorAction SilentlyContinue) {
+                $manifestPath = Join-Path $pluginDir.FullName "manifest.json"
+                $skillsDir = Join-Path $pluginDir.FullName "skills"
+                if ((Test-Path -LiteralPath $manifestPath -PathType Leaf) -and (Test-Path -LiteralPath $skillsDir -PathType Container)) {
+                    $manifest = Get-Item -LiteralPath $manifestPath
+                    $candidates += [pscustomobject]@{
+                        Path = $pluginDir.FullName
+                        ManifestLastWriteTime = $manifest.LastWriteTimeUtc
+                    }
+                }
+            }
+        }
+    }
+
+    if ($candidates.Count -eq 0) {
+        $searched = (Get-ClaudeSkillsPluginBasePaths) -join "; "
+        throw "未找到 Claude Desktop skills plugin 目录。已搜索: $searched"
+    }
+
+    return ($candidates | Sort-Object ManifestLastWriteTime -Descending | Select-Object -First 1).Path
+}
+
+function Read-SkillFrontmatter {
+    param([string]$SkillMdPath)
+
+    $text = Get-Content $SkillMdPath -Raw -Encoding UTF8
+    $lines = $text -split "`r?`n"
+    if ($lines.Count -eq 0 -or $lines[0].Trim() -ne "---") {
+        return @{}
+    }
+
+    $end = -1
+    for ($i = 1; $i -lt $lines.Count; $i++) {
+        if ($lines[$i].Trim() -eq "---") {
+            $end = $i
+            break
+        }
+    }
+    if ($end -lt 0) {
+        return @{}
+    }
+
+    $data = @{}
+    $key = ""
+    $valueLines = @()
+    $flushFrontmatterValue = {
+        if ($key) {
+            $data[$key] = (($valueLines | ForEach-Object { $_.Trim() }) -join "`n").Trim()
+        }
+        $key = ""
+        $valueLines = @()
+    }
+
+    for ($i = 1; $i -lt $end; $i++) {
+        $line = $lines[$i]
+        if (-not $line.Trim()) {
+            if ($key -and $valueLines.Count -gt 0) {
+                $valueLines += ""
+            }
+            continue
+        }
+
+        if ($line -match '^\s') {
+            if ($key) {
+                $valueLines += $line.Trim()
+            }
+            continue
+        }
+
+        $match = [regex]::Match($line, '^([A-Za-z0-9_-]+):(?:\s*(.*))?$')
+        if (-not $match.Success) {
+            continue
+        }
+
+        . $flushFrontmatterValue
+        $key = $match.Groups[1].Value
+        $value = $match.Groups[2].Value.Trim()
+        if ($value) {
+            $valueLines = @($value)
+        } else {
+            $valueLines = @()
+        }
+    }
+    . $flushFrontmatterValue
+
+    return $data
+}
+
+function Get-CCSwitchSkills {
+    param([string]$SkillsDirectory)
+
+    if (-not (Test-Path -LiteralPath $SkillsDirectory -PathType Container)) {
+        throw "CC Switch skills 目录不存在: $SkillsDirectory"
+    }
+
+    $skills = @()
+    foreach ($dir in Get-ChildItem -LiteralPath $SkillsDirectory -Directory -ErrorAction SilentlyContinue | Sort-Object Name) {
+        $skillMd = Join-Path $dir.FullName "SKILL.md"
+        if (-not (Test-Path -LiteralPath $skillMd -PathType Leaf)) {
+            continue
+        }
+
+        $frontmatter = Read-SkillFrontmatter $skillMd
+        $name = ""
+        if ($frontmatter.ContainsKey("name")) {
+            $name = ([string]$frontmatter["name"]).Trim()
+        }
+        if (-not $name) {
+            $name = $dir.Name
+        }
+        if (-not $name -or $name -eq "." -or $name -eq ".." -or $name.Contains("/") -or $name.Contains("\")) {
+            Write-Host "  [跳过] skill 名称无效: $name" -ForegroundColor DarkYellow
+            continue
+        }
+
+        $description = ""
+        if ($frontmatter.ContainsKey("description")) {
+            $description = ([string]$frontmatter["description"]).Trim()
+        }
+
+        $skills += [pscustomobject]@{
+            Name = $name
+            Description = $description
+            Path = $dir.FullName
+        }
+    }
+
+    return $skills
+}
+
+function Ensure-SkillsManifestList {
+    param([pscustomobject]$Manifest)
+
+    if (-not ($Manifest.PSObject.Properties.Name -contains "skills") -or $null -eq $Manifest.skills -or ($Manifest.skills -is [string])) {
+        Add-OrSetJsonProperty $Manifest "skills" @()
+    }
+}
+
+function Get-ReparsePointTarget {
+    param([string]$Path)
+
+    try {
+        $item = Get-Item -LiteralPath $Path -Force -ErrorAction Stop
+        if (-not (($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -eq [System.IO.FileAttributes]::ReparsePoint)) {
+            return ""
+        }
+
+        if ($item.PSObject.Properties.Name -contains "Target" -and $item.Target) {
+            if ($item.Target -is [array]) {
+                return [string]$item.Target[0]
+            }
+            return [string]$item.Target
+        }
+        if ($item.PSObject.Properties.Name -contains "LinkTarget" -and $item.LinkTarget) {
+            return [string]$item.LinkTarget
+        }
+    }
+    catch {
+        return ""
+    }
+
+    return ""
+}
+
+function Resolve-ExistingPath {
+    param([string]$Path)
+
+    try {
+        return [System.IO.Path]::GetFullPath($Path)
+    }
+    catch {
+        return ""
+    }
+}
+
+function Test-PathWithinDirectory {
+    param(
+        [string]$Path,
+        [string]$Parent
+    )
+
+    $fullPath = Resolve-ExistingPath $Path
+    $fullParent = Resolve-ExistingPath $Parent
+    if (-not $fullPath -or -not $fullParent) {
+        return $false
+    }
+
+    $fullParent = $fullParent.TrimEnd([System.IO.Path]::DirectorySeparatorChar, [System.IO.Path]::AltDirectorySeparatorChar)
+    return $fullPath.Equals($fullParent, [System.StringComparison]::OrdinalIgnoreCase) -or
+        $fullPath.StartsWith($fullParent + [System.IO.Path]::DirectorySeparatorChar, [System.StringComparison]::OrdinalIgnoreCase) -or
+        $fullPath.StartsWith($fullParent + [System.IO.Path]::AltDirectorySeparatorChar, [System.StringComparison]::OrdinalIgnoreCase)
+}
+
+function Remove-ReparsePoint {
+    param([string]$Path)
+
+    $item = Get-Item -LiteralPath $Path -Force -ErrorAction Stop
+    if (($item.Attributes -band [System.IO.FileAttributes]::Directory) -eq [System.IO.FileAttributes]::Directory) {
+        [System.IO.Directory]::Delete($Path, $false)
+    } else {
+        [System.IO.File]::Delete($Path)
+    }
+}
+
+function Sync-CCSwitchSkills {
+    $skillsDirectory = Get-CCSwitchSkillsDirectory
+    $pluginRoot = Find-ClaudeDesktopSkillsPluginRoot
+    $desktopSkillsDirectory = Join-Path $pluginRoot "skills"
+    $manifestPath = Join-Path $pluginRoot "manifest.json"
+    $manifest = Get-JsonObjectOrBackup $manifestPath
+    Ensure-SkillsManifestList $manifest
+
+    $manifestSkills = @($manifest.skills)
+    $existingNames = @{}
+    foreach ($item in $manifestSkills) {
+        if ($item -is [pscustomobject] -and $item.PSObject.Properties.Name -contains "name" -and [string]$item.name) {
+            $existingNames[[string]$item.name] = $true
+        }
+    }
+
+    $ccSkills = @(Get-CCSwitchSkills $skillsDirectory)
+    $now = [DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffZ")
+    $linked = 0
+    $manifestAdded = 0
+    $skipped = 0
+
+    Write-Host "Claude Desktop skills plugin: $pluginRoot"
+    Write-Host "CC Switch skills source: $skillsDirectory"
+
+    foreach ($skill in $ccSkills) {
+        $target = Join-Path $desktopSkillsDirectory $skill.Name
+        if ((Test-Path -LiteralPath $target) -or $existingNames.ContainsKey($skill.Name)) {
+            Write-Host "  同名 skill 已存在，跳过: $($skill.Name)" -ForegroundColor DarkYellow
+            $skipped++
+            continue
+        }
+
+        New-Item -ItemType SymbolicLink -Path $target -Target $skill.Path | Out-Null
+        $linked++
+        Write-Host "  同步软链接: $($skill.Name) -> $($skill.Path)" -ForegroundColor Green
+
+        $manifestItem = [pscustomobject][ordered]@{
+            skillId = $skill.Name
+            name = $skill.Name
+            description = $skill.Description
+            creatorType = "user"
+            syncManaged = $false
+            updatedAt = $now
+            enabled = $true
+        }
+        $manifestSkills += $manifestItem
+        $existingNames[$skill.Name] = $true
+        $manifestAdded++
+        Write-Host "  写入 manifest: $($skill.Name)" -ForegroundColor Green
+    }
+
+    if ($manifestAdded -gt 0) {
+        Add-OrSetJsonProperty $manifest "skills" $manifestSkills
+        Add-OrSetJsonProperty $manifest "lastUpdated" ([Int64]([DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()))
+        $backup = Join-Path $pluginRoot "manifest.json.bak-before-cc-switch-sync"
+        Copy-Item $manifestPath $backup -Force
+        Save-JsonNoBom $manifestPath $manifest
+    }
+
+    Write-Host "同步完成：新增软链接 $linked 个，新增 manifest $manifestAdded 条，跳过 $skipped 个。" -ForegroundColor Green
+}
+
+function Unsync-CCSwitchSkills {
+    $skillsDirectory = Get-CCSwitchSkillsDirectory
+    $pluginRoot = Find-ClaudeDesktopSkillsPluginRoot
+    $desktopSkillsDirectory = Join-Path $pluginRoot "skills"
+    $manifestPath = Join-Path $pluginRoot "manifest.json"
+    $manifest = Get-JsonObjectOrBackup $manifestPath
+    Ensure-SkillsManifestList $manifest
+    $removedNames = @{}
+    $skipped = 0
+
+    Write-Host "Claude Desktop skills plugin: $pluginRoot"
+    Write-Host "CC Switch skills source: $skillsDirectory"
+
+    foreach ($targetItem in Get-ChildItem -LiteralPath $desktopSkillsDirectory -Force -ErrorAction SilentlyContinue) {
+        $target = $targetItem.FullName
+        $targetItem = Get-Item -LiteralPath $target -Force
+        if (-not (($targetItem.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -eq [System.IO.FileAttributes]::ReparsePoint)) {
+            Write-Host "  不是 CC Switch 同步软链接，跳过: $($targetItem.Name)" -ForegroundColor DarkYellow
+            $skipped++
+            continue
+        }
+
+        $linkTarget = Get-ReparsePointTarget $target
+        if (-not $linkTarget) {
+            Write-Host "  无法解析软链接目标，跳过: $target" -ForegroundColor DarkYellow
+            $skipped++
+            continue
+        }
+        if (-not [System.IO.Path]::IsPathRooted($linkTarget)) {
+            $linkTarget = Join-Path $desktopSkillsDirectory $linkTarget
+        }
+        $resolvedTarget = Resolve-ExistingPath $linkTarget
+        if (-not (Test-PathWithinDirectory $resolvedTarget $skillsDirectory)) {
+            Write-Host "  软链接目标不在 CC Switch skills 目录内，跳过: $($targetItem.Name)" -ForegroundColor DarkYellow
+            $skipped++
+            continue
+        }
+
+        Remove-ReparsePoint $target
+        $removedNames[$targetItem.Name] = $true
+        Write-Host "  删除同步: $($targetItem.Name) -> $resolvedTarget" -ForegroundColor Green
+    }
+
+    if ($removedNames.Count -gt 0) {
+        $oldManifestSkills = @($manifest.skills)
+        $keptSkills = @()
+        foreach ($item in $oldManifestSkills) {
+            if ($item -is [pscustomobject] -and $item.PSObject.Properties.Name -contains "name" -and $removedNames.ContainsKey([string]$item.name)) {
+                continue
+            }
+            $keptSkills += $item
+        }
+        $removedManifestCount = $oldManifestSkills.Count - $keptSkills.Count
+        Add-OrSetJsonProperty $manifest "skills" $keptSkills
+        Add-OrSetJsonProperty $manifest "lastUpdated" ([Int64]([DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()))
+        $backup = Join-Path $pluginRoot "manifest.json.bak-before-cc-switch-sync"
+        Copy-Item $manifestPath $backup -Force
+        Save-JsonNoBom $manifestPath $manifest
+        Write-Host "取消同步完成：删除 $($removedNames.Count) 个软链接，删除 $removedManifestCount 条 manifest 记录，跳过 $skipped 个。" -ForegroundColor Green
+    } else {
+        Write-Host "取消同步完成：删除 0 个，跳过 $skipped 个。" -ForegroundColor Green
     }
 }
 
@@ -2725,6 +3119,8 @@ try {
         "uninstall" { Uninstall-WindowsLanguagePack }
         "disable-updates" { Set-ThirdPartyAutoUpdates $false }
         "enable-updates" { Set-ThirdPartyAutoUpdates $true }
+        "sync-skills" { Sync-CCSwitchSkills }
+        "unsync-skills" { Unsync-CCSwitchSkills }
     }
 
     Stop-InstallLog
