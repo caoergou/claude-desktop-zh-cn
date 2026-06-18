@@ -532,13 +532,26 @@ def build_online_dom_translation_script(lang_code: str, mapping: dict[str, str])
     if lang_code == "zh-CN":
         selected_text = "已选择 $1 项"
         delete_selected_text = "删除 $1 个所选项目"
+        delete_sessions_text = "删除 $1 个会话？"
+        delete_named_session_text = "“$1”将被永久删除。此操作无法撤消。"
+        archive_selected_tasks_text = "归档所选任务？"
+        archive_tasks_moved_text = "$1 个任务将被移至“已归档”。"
     else:
         selected_text = "已選擇 $1 項"
         delete_selected_text = "刪除 $1 個所選項目"
+        delete_sessions_text = "刪除 $1 個工作階段？"
+        delete_named_session_text = "「$1」將被永久刪除。此操作無法復原。"
+        archive_selected_tasks_text = "歸檔所選任務？"
+        archive_tasks_moved_text = "$1 個任務將被移至「已歸檔」。"
     dynamic_rules = "".join((
         f'[/^(\\d+) selected$/,"{selected_text}"],'
         f'[/^Delete (\\d+) selected item$/,"{delete_selected_text}"],'
         f'[/^Delete (\\d+) selected items$/,"{delete_selected_text}"],'
+        f'[/^Delete (\\d+) sessions?\\?$/,"{delete_sessions_text}"],'
+        f'[/^[“\\"](.+?)[”\\"] will be permanently deleted\\. This can[’\\\']t be undone\\.$/,"{delete_named_session_text}"],'
+        f'[/^Archive selected task\\?$/,"{archive_selected_tasks_text}"],'
+        f'[/^Archive selected tasks\\?$/,"{archive_selected_tasks_text}"],'
+        f'[/^(\\d+) tasks? will be moved to Archived\\.$/,"{archive_tasks_moved_text}"],'
         '[/^Mon$/,"周一"],[/^Tue$/,"周二"],[/^Wed$/,"周三"],[/^Thu$/,"周四"],'
         '[/^Fri$/,"周五"],[/^Sat$/,"周六"],[/^Sun$/,"周日"]'
     ))
