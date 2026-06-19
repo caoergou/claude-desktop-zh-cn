@@ -26,6 +26,7 @@ $LanguageListPattern = [System.Text.RegularExpressions.Regex]::Escape($BaseLangu
 $AsarPatchTarget = ".vite/build/index.js"
 $AsarIntegrityBlockSize = 4 * 1024 * 1024
 $OnlineLocaleMainMarker = "__claudeZhOnlineLocaleMain"
+$MenuRuntimeMarker = "__claudeZhMenuRuntimePatch"
 $OnlineTranslationMaxSourceLength = 240
 $script:CurrentBackupSetPath = $null
 $script:DetectedUnpackagedClaudePaths = @()
@@ -1609,6 +1610,106 @@ function Patch-HardcodedFrontendStrings {
     Write-Host "  patched hardcoded frontend strings: $patchedStrings replacements in $patchedFiles files" -ForegroundColor Green
 }
 
+function Get-MainProcessMenuRoleReplacementPairs {
+    param([string]$Language)
+
+    switch ($Language) {
+        "zh-CN" {
+            return @(
+                @("about", "关于..."),
+                @("close", "关闭窗口"),
+                @("copy", "复制"),
+                @("cut", "剪切"),
+                @("find", "查找"),
+                @("findNext", "查找下一个"),
+                @("findPrevious", "查找上一个"),
+                @("forceReload", "强制重新加载"),
+                @("paste", "粘贴"),
+                @("preferences", "设置..."),
+                @("quit", "退出"),
+                @("redo", "重做"),
+                @("reload", "重新加载"),
+                @("resetZoom", "实际大小"),
+                @("selectAll", "全选"),
+                @("settings", "设置..."),
+                @("undo", "撤销"),
+                @("zoomIn", "放大"),
+                @("zoomOut", "缩小")
+            )
+        }
+        "zh-TW" {
+            return @(
+                @("about", "關於..."),
+                @("close", "關閉視窗"),
+                @("copy", "複製"),
+                @("cut", "剪下"),
+                @("find", "尋找"),
+                @("findNext", "尋找下一個"),
+                @("findPrevious", "尋找上一個"),
+                @("forceReload", "強制重新載入"),
+                @("paste", "貼上"),
+                @("preferences", "設定..."),
+                @("quit", "結束"),
+                @("redo", "重做"),
+                @("reload", "重新載入"),
+                @("resetZoom", "實際大小"),
+                @("selectAll", "全選"),
+                @("settings", "設定..."),
+                @("undo", "復原"),
+                @("zoomIn", "放大"),
+                @("zoomOut", "縮小")
+            )
+        }
+        "zh-HK" {
+            return @(
+                @("about", "關於..."),
+                @("close", "關閉視窗"),
+                @("copy", "複製"),
+                @("cut", "剪下"),
+                @("find", "尋找"),
+                @("findNext", "尋找下一個"),
+                @("findPrevious", "尋找上一個"),
+                @("forceReload", "強制重新載入"),
+                @("paste", "貼上"),
+                @("preferences", "設定..."),
+                @("quit", "結束"),
+                @("redo", "重做"),
+                @("reload", "重新載入"),
+                @("resetZoom", "實際大小"),
+                @("selectAll", "全選"),
+                @("settings", "設定..."),
+                @("undo", "還原"),
+                @("zoomIn", "放大"),
+                @("zoomOut", "縮小")
+            )
+        }
+        default {
+            throw "Unsupported language for main-process menu roles: $Language"
+        }
+    }
+}
+
+function Convert-PairsToHashtable {
+    param([object[]]$Pairs)
+
+    $map = [ordered]@{}
+    foreach ($pair in $Pairs) {
+        $map[$pair[0]] = $pair[1]
+    }
+    return $map
+}
+
+function Get-MenuRuntimePatch {
+    param(
+        [object[]]$LabelPairs,
+        [object[]]$RolePairs
+    )
+
+    $labelJson = Convert-PairsToHashtable $LabelPairs | ConvertTo-Json -Compress -Depth 20
+    $roleJson = Convert-PairsToHashtable $RolePairs | ConvertTo-Json -Compress -Depth 20
+    return ';(()=>{try{const e=require("electron"),M=' + $labelJson + ',R=' + $roleJson + ';if(!e||!e.Menu||e.Menu.__claudeZhMenuRuntimePatch)return;const n=s=>String(s||"").replace(/\u2026/g,"...").trim(),t=s=>M[s]||M[n(s)]||M[String(s||"").replace(/\.\.\.$/,"…")];function w(a){if(!Array.isArray(a))return;for(const i of a){if(!i||typeof i!=="object")continue;if(i.label){const l=t(i.label);if(l)i.label=l}const r=i.role==null?"":String(i.role),k=R[r]||R[r.charAt(0).toLowerCase()+r.slice(1)]||R[r.toLowerCase()];if(!i.label&&k)i.label=k;if(Array.isArray(i.submenu))w(i.submenu)}}const b=e.Menu.buildFromTemplate;e.Menu.buildFromTemplate=function(a){try{w(a)}catch{}return b.call(this,a)};if(e.MenuItem&&!e.MenuItem.__claudeZhMenuRuntimePatch){const I=e.MenuItem;e.MenuItem=function(o){try{w([o])}catch{}return new I(o)};e.MenuItem.prototype=I.prototype;Object.setPrototypeOf(e.MenuItem,I);Object.defineProperty(e.MenuItem,"__claudeZhMenuRuntimePatch",{value:!0})}Object.defineProperty(e.Menu,"__claudeZhMenuRuntimePatch",{value:!0})}catch{}})();/*' + $MenuRuntimeMarker + '*/'
+}
+
 function Patch-HardcodedMainProcessMenuLabels {
     param(
         [string]$ResourcesPath,
@@ -1625,7 +1726,34 @@ function Patch-HardcodedMainProcessMenuLabels {
                 @("View", "查看"),
                 @("Developer", "开发者"),
                 @("Help", "帮助"),
+                @("New Conversation", "新对话"),
+                @("Settings…", "设置…"),
+                @("Settings...", "设置..."),
+                @("Close Window", "关闭窗口"),
+                @("Exit", "退出"),
+                @("Undo", "撤销"),
+                @("Redo", "重做"),
+                @("Cut", "剪切"),
+                @("Copy", "复制"),
+                @("Paste", "粘贴"),
+                @("Select All", "全选"),
+                @("Find", "查找"),
+                @("Find Next", "查找下一个"),
+                @("Find Previous", "查找上一个"),
+                @("Reload", "重新加载"),
+                @("Actual Size", "实际大小"),
+                @("Zoom In", "放大"),
+                @("Zoom Out", "缩小"),
+                @("Copy URL", "复制 URL"),
                 @("Extensions", "扩展"),
+                @("Install Extension…", "安装扩展…"),
+                @("Install Extension...", "安装扩展..."),
+                @("Install Unpacked Extension…", "安装未打包的扩展…"),
+                @("Install Unpacked Extension...", "安装未打包的扩展..."),
+                @("Open Extensions Folder…", "打开扩展文件夹…"),
+                @("Open Extensions Folder...", "打开扩展文件夹..."),
+                @("Open Extension Settings Folder…", "打开扩展设置文件夹…"),
+                @("Open Extension Settings Folder...", "打开扩展设置文件夹..."),
                 @("Open Developer Config File…", "打开开发者配置文件…"),
                 @("Open Developer Config File...", "打开开发者配置文件..."),
                 @("Configure Third-Party Inference…", "配置第三方推理…"),
@@ -1643,7 +1771,14 @@ function Patch-HardcodedMainProcessMenuLabels {
                 @("Enable Main Process Debugger", "启用主进程调试器"),
                 @("Record Performance Trace", "记录性能跟踪"),
                 @("Write Main Process Heap Snapshot", "写入主进程堆快照"),
-                @("Record Memory Trace (auto-stop)", "记录内存跟踪 (自动)")
+                @("Record Memory Trace (auto-stop)", "记录内存跟踪 (自动)"),
+                @("Open Documentation", "打开文档"),
+                @("Check for Updates…", "检查更新…"),
+                @("Check for Updates...", "检查更新..."),
+                @("Troubleshooting", "故障排除"),
+                @("Get Support", "获取支持"),
+                @("About…", "关于…"),
+                @("About...", "关于...")
             )
             $intlReplacements = @(
                 @("0tZLEYF8mJ", "开发者"),
@@ -1659,7 +1794,38 @@ function Patch-HardcodedMainProcessMenuLabels {
                 @("rNAd+HxSK4", "打开 MCP 日志文件"),
                 @("PW5U8NgTto", "打开 MCP 日志文件..."),
                 @("uKCcuVd1Yt", "重新加载 MCP 配置"),
-                @("9GRz7bC+rr", "配置第三方推理…")
+                @("9GRz7bC+rr", "配置第三方推理…"),
+                @("baGq3gy8z1", "新对话"),
+                @("ODySlGptaj", "设置…"),
+                @("IHsCTXnnSv", "关闭窗口"),
+                @("7fdcqxofEs", "退出"),
+                @("dKX0bpR+a2", "退出"),
+                @("Xda79B7DPP", "撤销"),
+                @("fFJxOwJRj2", "撤销"),
+                @("R0/CZEcsoI", "重做"),
+                @("3ML3xT+gEV", "重做"),
+                @("TH+W2Ad73P", "剪切"),
+                @("4MLbtbVfJv", "剪切"),
+                @("+7sd9hoyZA", "复制"),
+                @("3unrKzH4zB", "复制"),
+                @("JVwNvMZjVT", "粘贴"),
+                @("KAo3lt5Hv+", "粘贴"),
+                @("8YQEOfuaGO", "全选"),
+                @("grarAzxOkG", "全选"),
+                @("O3rtEd7aMd", "查找"),
+                @("Ko/2Ml7mZG", "重新加载此页面"),
+                @("+/cwsayrqk", "实际大小"),
+                @("Z9g5m/V9Nq", "放大"),
+                @("XZ36+EBE5/", "缩小"),
+                @("WvMIEFradI", "复制链接"),
+                @("l6/rglN9Fm", "复制 URL"),
+                @("YgfdkMAdfQ", "打开硬件伙伴…"),
+                @("Q0f46SlJw", "扩展"),
+                @("j66cdL4EK5", "打开文档"),
+                @("mRXjxhS6p4", "检查更新…"),
+                @("4XmExNuKUb", "故障排除"),
+                @("XfMPtFNO8C", "获取支持"),
+                @("5DUIVR3fVi", "关于...")
             )
         }
         "zh-TW" {
@@ -1669,7 +1835,34 @@ function Patch-HardcodedMainProcessMenuLabels {
                 @("View", "檢視"),
                 @("Developer", "開發者"),
                 @("Help", "說明"),
+                @("New Conversation", "新對話"),
+                @("Settings…", "設定…"),
+                @("Settings...", "設定..."),
+                @("Close Window", "關閉視窗"),
+                @("Exit", "結束"),
+                @("Undo", "復原"),
+                @("Redo", "重做"),
+                @("Cut", "剪下"),
+                @("Copy", "複製"),
+                @("Paste", "貼上"),
+                @("Select All", "全選"),
+                @("Find", "尋找"),
+                @("Find Next", "尋找下一個"),
+                @("Find Previous", "尋找上一個"),
+                @("Reload", "重新載入"),
+                @("Actual Size", "實際大小"),
+                @("Zoom In", "放大"),
+                @("Zoom Out", "縮小"),
+                @("Copy URL", "複製 URL"),
                 @("Extensions", "擴充功能"),
+                @("Install Extension…", "安裝擴充功能…"),
+                @("Install Extension...", "安裝擴充功能..."),
+                @("Install Unpacked Extension…", "安裝未封裝的擴充功能…"),
+                @("Install Unpacked Extension...", "安裝未封裝的擴充功能..."),
+                @("Open Extensions Folder…", "開啟擴充功能資料夾…"),
+                @("Open Extensions Folder...", "開啟擴充功能資料夾..."),
+                @("Open Extension Settings Folder…", "開啟擴充功能設定資料夾…"),
+                @("Open Extension Settings Folder...", "開啟擴充功能設定資料夾..."),
                 @("Open Developer Config File…", "開啟開發者設定檔…"),
                 @("Open Developer Config File...", "開啟開發者設定檔..."),
                 @("Configure Third-Party Inference…", "設定第三方推理…"),
@@ -1687,7 +1880,14 @@ function Patch-HardcodedMainProcessMenuLabels {
                 @("Enable Main Process Debugger", "啟用主行程偵錯器"),
                 @("Record Performance Trace", "記錄效能追蹤"),
                 @("Write Main Process Heap Snapshot", "寫入主行程堆積快照"),
-                @("Record Memory Trace (auto-stop)", "記錄記憶體追蹤 (自動)")
+                @("Record Memory Trace (auto-stop)", "記錄記憶體追蹤 (自動)"),
+                @("Open Documentation", "開啟文件"),
+                @("Check for Updates…", "檢查更新…"),
+                @("Check for Updates...", "檢查更新..."),
+                @("Troubleshooting", "疑難排解"),
+                @("Get Support", "取得支援"),
+                @("About…", "關於…"),
+                @("About...", "關於...")
             )
             $intlReplacements = @(
                 @("0tZLEYF8mJ", "開發者"),
@@ -1703,7 +1903,38 @@ function Patch-HardcodedMainProcessMenuLabels {
                 @("rNAd+HxSK4", "開啟 MCP 記錄檔"),
                 @("PW5U8NgTto", "開啟 MCP 記錄檔..."),
                 @("uKCcuVd1Yt", "重新載入 MCP 設定"),
-                @("9GRz7bC+rr", "設定第三方推理…")
+                @("9GRz7bC+rr", "設定第三方推理…"),
+                @("baGq3gy8z1", "新對話"),
+                @("ODySlGptaj", "設定…"),
+                @("IHsCTXnnSv", "關閉視窗"),
+                @("7fdcqxofEs", "結束"),
+                @("dKX0bpR+a2", "結束"),
+                @("Xda79B7DPP", "復原"),
+                @("fFJxOwJRj2", "復原"),
+                @("R0/CZEcsoI", "重做"),
+                @("3ML3xT+gEV", "重做"),
+                @("TH+W2Ad73P", "剪下"),
+                @("4MLbtbVfJv", "剪下"),
+                @("+7sd9hoyZA", "複製"),
+                @("3unrKzH4zB", "複製"),
+                @("JVwNvMZjVT", "貼上"),
+                @("KAo3lt5Hv+", "貼上"),
+                @("8YQEOfuaGO", "全選"),
+                @("grarAzxOkG", "全選"),
+                @("O3rtEd7aMd", "尋找"),
+                @("Ko/2Ml7mZG", "重新載入此頁面"),
+                @("+/cwsayrqk", "實際大小"),
+                @("Z9g5m/V9Nq", "放大"),
+                @("XZ36+EBE5/", "縮小"),
+                @("WvMIEFradI", "複製連結"),
+                @("l6/rglN9Fm", "複製 URL"),
+                @("YgfdkMAdfQ", "開啟硬體夥伴…"),
+                @("Q0f46SlJw", "擴充功能"),
+                @("j66cdL4EK5", "開啟文件"),
+                @("mRXjxhS6p4", "檢查更新…"),
+                @("4XmExNuKUb", "疑難排解"),
+                @("XfMPtFNO8C", "取得支援"),
+                @("5DUIVR3fVi", "關於...")
             )
         }
         "zh-HK" {
@@ -1713,7 +1944,34 @@ function Patch-HardcodedMainProcessMenuLabels {
                 @("View", "檢視"),
                 @("Developer", "開發者"),
                 @("Help", "說明"),
+                @("New Conversation", "新對話"),
+                @("Settings…", "設定…"),
+                @("Settings...", "設定..."),
+                @("Close Window", "關閉視窗"),
+                @("Exit", "結束"),
+                @("Undo", "還原"),
+                @("Redo", "重做"),
+                @("Cut", "剪下"),
+                @("Copy", "複製"),
+                @("Paste", "貼上"),
+                @("Select All", "全選"),
+                @("Find", "尋找"),
+                @("Find Next", "尋找下一個"),
+                @("Find Previous", "尋找上一個"),
+                @("Reload", "重新載入"),
+                @("Actual Size", "實際大小"),
+                @("Zoom In", "放大"),
+                @("Zoom Out", "縮小"),
+                @("Copy URL", "複製 URL"),
                 @("Extensions", "擴充功能"),
+                @("Install Extension…", "安裝擴充功能…"),
+                @("Install Extension...", "安裝擴充功能..."),
+                @("Install Unpacked Extension…", "安裝未封裝的擴充功能…"),
+                @("Install Unpacked Extension...", "安裝未封裝的擴充功能..."),
+                @("Open Extensions Folder…", "開啟擴充功能資料夾…"),
+                @("Open Extensions Folder...", "開啟擴充功能資料夾..."),
+                @("Open Extension Settings Folder…", "開啟擴充功能設定資料夾…"),
+                @("Open Extension Settings Folder...", "開啟擴充功能設定資料夾..."),
                 @("Open Developer Config File…", "開啟開發者設定檔…"),
                 @("Open Developer Config File...", "開啟開發者設定檔..."),
                 @("Configure Third-Party Inference…", "設定第三方推理…"),
@@ -1731,7 +1989,14 @@ function Patch-HardcodedMainProcessMenuLabels {
                 @("Enable Main Process Debugger", "啟用主行程偵錯器"),
                 @("Record Performance Trace", "記錄效能追蹤"),
                 @("Write Main Process Heap Snapshot", "寫入主行程堆積快照"),
-                @("Record Memory Trace (auto-stop)", "記錄記憶體追蹤 (自動)")
+                @("Record Memory Trace (auto-stop)", "記錄記憶體追蹤 (自動)"),
+                @("Open Documentation", "開啟文件"),
+                @("Check for Updates…", "檢查更新…"),
+                @("Check for Updates...", "檢查更新..."),
+                @("Troubleshooting", "疑難排解"),
+                @("Get Support", "取得支援"),
+                @("About…", "關於…"),
+                @("About...", "關於...")
             )
             $intlReplacements = @(
                 @("0tZLEYF8mJ", "開發者"),
@@ -1747,7 +2012,38 @@ function Patch-HardcodedMainProcessMenuLabels {
                 @("rNAd+HxSK4", "開啟 MCP 記錄檔"),
                 @("PW5U8NgTto", "開啟 MCP 記錄檔..."),
                 @("uKCcuVd1Yt", "重新載入 MCP 設定"),
-                @("9GRz7bC+rr", "設定第三方推理…")
+                @("9GRz7bC+rr", "設定第三方推理…"),
+                @("baGq3gy8z1", "新對話"),
+                @("ODySlGptaj", "設定…"),
+                @("IHsCTXnnSv", "關閉視窗"),
+                @("7fdcqxofEs", "結束"),
+                @("dKX0bpR+a2", "結束"),
+                @("Xda79B7DPP", "還原"),
+                @("fFJxOwJRj2", "還原"),
+                @("R0/CZEcsoI", "重做"),
+                @("3ML3xT+gEV", "重做"),
+                @("TH+W2Ad73P", "剪下"),
+                @("4MLbtbVfJv", "剪下"),
+                @("+7sd9hoyZA", "複製"),
+                @("3unrKzH4zB", "複製"),
+                @("JVwNvMZjVT", "貼上"),
+                @("KAo3lt5Hv+", "貼上"),
+                @("8YQEOfuaGO", "全選"),
+                @("grarAzxOkG", "全選"),
+                @("O3rtEd7aMd", "尋找"),
+                @("Ko/2Ml7mZG", "重新載入此頁面"),
+                @("+/cwsayrqk", "實際大小"),
+                @("Z9g5m/V9Nq", "放大"),
+                @("XZ36+EBE5/", "縮小"),
+                @("WvMIEFradI", "複製連結"),
+                @("l6/rglN9Fm", "複製 URL"),
+                @("YgfdkMAdfQ", "開啟硬件夥伴…"),
+                @("Q0f46SlJw", "擴充功能"),
+                @("j66cdL4EK5", "開啟文件"),
+                @("mRXjxhS6p4", "檢查更新…"),
+                @("4XmExNuKUb", "疑難排解"),
+                @("XfMPtFNO8C", "取得支援"),
+                @("5DUIVR3fVi", "關於...")
             )
         }
         default {
@@ -1774,7 +2070,21 @@ function Patch-HardcodedMainProcessMenuLabels {
     $patched = $text
     $count = 0
     $intlCount = 0
+    $runtimeCount = 0
     $repairCount = 0
+
+    $runtimePattern = ';\(\(\)=>\{try\{const e=require\("electron"\),M=.*?/\*' + [regex]::Escape($MenuRuntimeMarker) + '\*/'
+    $script:__menuRuntimeRemovedCount = 0
+    $patched = [regex]::Replace(
+        $patched,
+        $runtimePattern,
+        {
+            param($match)
+            $script:__menuRuntimeRemovedCount += 1
+            return ""
+        },
+        [System.Text.RegularExpressions.RegexOptions]::Singleline
+    )
 
     $unsafeRepairs = @(
         @("文件", "File"),
@@ -1813,7 +2123,6 @@ function Patch-HardcodedMainProcessMenuLabels {
         $target = $pair[1]
         $literal = ConvertTo-Json $target -Compress
         $needle = 'id:"' + $id + '"'
-        $pattern = '[A-Za-z_$][A-Za-z0-9_$]*\(\)\.formatMessage\(\{defaultMessage:"(?:\\.|[^"\\])*",id:"' + [regex]::Escape($id) + '"(?:,description:"(?:\\.|[^"\\])*")?\}\)'
         $searchStart = 0
         while ($true) {
             $idIndex = $patched.IndexOf($needle, $searchStart, [System.StringComparison]::Ordinal)
@@ -1821,17 +2130,37 @@ function Patch-HardcodedMainProcessMenuLabels {
                 break
             }
 
-            $windowStart = [Math]::Max(0, $idIndex - 600)
-            $windowEnd = [Math]::Min($patched.Length, $idIndex + 600)
-            $window = $patched.Substring($windowStart, $windowEnd - $windowStart)
-            $match = [regex]::Match($window, $pattern)
-            if (-not $match.Success) {
+            $callStart = $patched.LastIndexOf(".formatMessage({", $idIndex, [System.StringComparison]::Ordinal)
+            if ($callStart -lt 0) {
                 $searchStart = $idIndex + $needle.Length
                 continue
             }
 
-            $absoluteStart = $windowStart + $match.Index
-            $patched = $patched.Substring(0, $absoluteStart) + $literal + $patched.Substring($absoluteStart + $match.Length)
+            $receiverStart = $callStart - 1
+            while ($receiverStart -ge 0) {
+                $ch = $patched[$receiverStart]
+                $isCallChar = (($ch -ge 'a') -and ($ch -le 'z')) -or (($ch -ge 'A') -and ($ch -le 'Z')) -or (($ch -ge '0') -and ($ch -le '9')) -or ($ch -eq '_') -or ($ch -eq '$') -or ($ch -eq '.') -or ($ch -eq '(') -or ($ch -eq ')')
+                if (-not $isCallChar) {
+                    break
+                }
+                $receiverStart -= 1
+            }
+            $receiverStart += 1
+
+            $callEnd = $patched.IndexOf("})", $idIndex, [System.StringComparison]::Ordinal)
+            if ($callEnd -lt 0) {
+                $searchStart = $idIndex + $needle.Length
+                continue
+            }
+            $absoluteStart = $receiverStart
+            $absoluteEnd = $callEnd + 2
+            $callText = $patched.Substring($absoluteStart, $absoluteEnd - $absoluteStart)
+            if ((-not $callText.Contains("formatMessage({")) -or (-not $callText.Contains($needle))) {
+                $searchStart = $idIndex + $needle.Length
+                continue
+            }
+
+            $patched = $patched.Substring(0, $absoluteStart) + $literal + $patched.Substring($absoluteEnd)
             $intlCount += 1
             $searchStart = $absoluteStart + $literal.Length
         }
@@ -1860,9 +2189,21 @@ function Patch-HardcodedMainProcessMenuLabels {
         $count += $occurrences
     }
 
-    if (($count -eq 0) -and ($intlCount -eq 0) -and ($repairCount -eq 0)) {
+    if (-not $patched.Contains($MenuRuntimeMarker)) {
+        $patched = (Get-MenuRuntimePatch $replacements (Get-MainProcessMenuRoleReplacementPairs $Language)) + $patched
+        $runtimeCount = 1
+    }
+    elseif ($script:__menuRuntimeRemovedCount -gt 0) {
+        $runtimeCount = 1
+    }
+    $script:__menuRuntimeRemovedCount = 0
+
+    if (($count -eq 0) -and ($intlCount -eq 0) -and ($runtimeCount -eq 0) -and ($repairCount -eq 0)) {
         Write-Host "  hardcoded main-process menu labels already patched" -ForegroundColor Green
         return
+    }
+    if (($count -eq 0) -and ($intlCount -eq 0) -and ($runtimeCount -eq 0)) {
+        throw "Could not patch main-process menu labels; Claude's menu bundle format may have changed."
     }
 
     $patchedContent = [System.Text.Encoding]::UTF8.GetBytes($patched)
@@ -1870,7 +2211,7 @@ function Patch-HardcodedMainProcessMenuLabels {
     if ($repairCount -gt 0) {
         Write-Host "  repaired unsafe short main-process menu replacements: $repairCount occurrences" -ForegroundColor Yellow
     }
-    Write-Host "  patched hardcoded main-process menu labels: $($count + $intlCount) replacements" -ForegroundColor Green
+    Write-Host "  patched hardcoded main-process menu labels: $($count + $intlCount) replacements, runtime patch: $runtimeCount" -ForegroundColor Green
 }
 
 function Set-ClaudeLocale {
@@ -2530,68 +2871,127 @@ function Remove-LanguageFiles {
     }
 }
 
+function Test-ClaudeDesktopProcessPath {
+    param([string]$Path)
+
+    if (-not $Path) {
+        return $false
+    }
+    return ($Path -match "WindowsApps\\Claude_" -or $Path -match "AnthropicClaude\\app-")
+}
+
+function Get-ClaudeDesktopProcesses {
+    $procs = @()
+    foreach ($proc in Get-Process -Name "claude" -ErrorAction SilentlyContinue) {
+        try {
+            $path = $proc.MainModule.FileName
+            if (Test-ClaudeDesktopProcessPath $path) {
+                $procs += $proc
+            }
+        } catch {
+            # MainModule inaccessible (permission or 32/64 mismatch) — skip rather than risk killing Claude Code.
+        }
+    }
+    return @($procs | Sort-Object Id -Unique)
+}
+
+function Get-ClaudeCoworkProcesses {
+    $items = @(Get-CimInstance Win32_Process -ErrorAction SilentlyContinue |
+        Where-Object {
+            $_.Name -ieq "cowork-svc.exe" -and (Test-ClaudeDesktopProcessPath $_.ExecutablePath)
+        })
+
+    $procs = @()
+    foreach ($item in $items) {
+        $proc = Get-Process -Id $item.ProcessId -ErrorAction SilentlyContinue
+        if ($proc) {
+            $procs += $proc
+        }
+    }
+    return @($procs | Sort-Object Id -Unique)
+}
+
+function Wait-ProcessesExit {
+    param(
+        [object[]]$Processes,
+        [int]$TimeoutSeconds = 10
+    )
+
+    $remaining = @($Processes)
+    $elapsed = 0
+    while ($elapsed -lt $TimeoutSeconds) {
+        if ($remaining.Count -eq 0) {
+            return @()
+        }
+        Start-Sleep -Seconds 1
+        $elapsed++
+        $remaining = @($remaining | Where-Object {
+            try { -not $_.HasExited } catch { $false }
+        })
+    }
+    return @($remaining)
+}
+
 function Stop-ClaudeProcessesGracefully {
     param(
         [int]$TimeoutSeconds = 10
     )
 
-    $procs = @()
-    foreach ($proc in Get-Process -Name "claude" -ErrorAction SilentlyContinue) {
-        try {
-            $path = $proc.MainModule.FileName
-            if ($path -and ($path -match "WindowsApps\\Claude_" -or $path -match "AnthropicClaude\\app-")) {
-                $procs += $proc
-            }
-        } catch {
-            # MainModule inaccessible (permission or 32/64 mismatch) — skip
-        }
-    }
-
-    if ($procs.Count -eq 0) {
+    $desktopProcs = @(Get-ClaudeDesktopProcesses)
+    $coworkProcs = @(Get-ClaudeCoworkProcesses)
+    if (($desktopProcs.Count + $coworkProcs.Count) -eq 0) {
         return $true
     }
 
-    # 第一层：发送 WM_CLOSE 消息（/T 通知子进程，不带 /F），允许 Electron 执行 app.quit() 和数据库 flush
-    foreach ($proc in $procs) {
+    foreach ($proc in $desktopProcs) {
         Write-Host "  正在请求 Claude Desktop 优雅退出 (PID $($proc.Id))..." -ForegroundColor DarkGray
         try {
-            $null = & taskkill /PID $proc.Id /T 2>&1
-        } catch {
-            # taskkill 失败，继续等待超时后强制终止
-        }
-    }
-
-    # 等待进程退出，每秒检查一次，提前跳出
-    $elapsed = 0
-    while ($elapsed -lt $TimeoutSeconds) {
-        Start-Sleep -Seconds 1
-        $elapsed++
-        $stillRunning = @()
-        foreach ($proc in $procs) {
-            if (-not $proc.HasExited) {
-                $stillRunning += $proc
+            if ($proc.MainWindowHandle -ne 0) {
+                [void]$proc.CloseMainWindow()
+            } else {
+                $null = & taskkill /PID $proc.Id 2>&1
             }
+        } catch {
+            # 继续等待，必要时只终止 Claude Desktop 自身，不终止进程树。
         }
-        if ($stillRunning.Count -eq 0) {
-            Write-Host "  Claude Desktop 已优雅退出" -ForegroundColor Green
-            return $true
-        }
-        $procs = $stillRunning
     }
 
-    # 第二层：超时后才回退到 taskkill /T /F 强制终止进程树
-    Write-Host "  优雅退出超时（${TimeoutSeconds}秒），强制终止剩余进程..." -ForegroundColor DarkYellow
-    foreach ($proc in $procs) {
-        if (-not $proc.HasExited) {
+    $remainingDesktop = @(Wait-ProcessesExit $desktopProcs $TimeoutSeconds)
+    if ($remainingDesktop.Count -gt 0) {
+        Write-Host "  Claude Desktop 优雅退出超时（${TimeoutSeconds}秒），仅强制终止 Desktop 主进程..." -ForegroundColor DarkYellow
+        foreach ($proc in $remainingDesktop) {
             try {
-                $null = & taskkill /PID $proc.Id /T /F 2>&1
+                Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
             } catch {
                 # 已退出或无法终止
             }
         }
+        Start-Sleep -Seconds 1
     }
 
-    Start-Sleep -Seconds 1
+    # cowork-svc.exe 不叫 claude.exe，旧逻辑不会停它；恢复/覆盖 app.asar 时它可能继续占用资源。
+    $coworkProcs = @(Get-ClaudeCoworkProcesses)
+    if ($coworkProcs.Count -gt 0) {
+        foreach ($proc in $coworkProcs) {
+            Write-Host "  正在停止 Claude Cowork 服务进程 (PID $($proc.Id))..." -ForegroundColor DarkGray
+            try {
+                Stop-Process -Id $proc.Id -Force -ErrorAction SilentlyContinue
+            } catch {
+                # 已退出或权限不足
+            }
+        }
+        $remainingCowork = @(Wait-ProcessesExit $coworkProcs 5)
+        foreach ($proc in $remainingCowork) {
+            Write-Host "  [警告] 未能停止 Cowork 进程 PID $($proc.Id)，可能需要管理员权限或手动结束。" -ForegroundColor DarkYellow
+        }
+    }
+
+    $stillDesktop = @(Get-ClaudeDesktopProcesses)
+    $stillCowork = @(Get-ClaudeCoworkProcesses)
+    if (($stillDesktop.Count + $stillCowork.Count) -eq 0) {
+        Write-Host "  Claude Desktop/Cowork 已停止" -ForegroundColor Green
+        return $true
+    }
     return $false
 }
 

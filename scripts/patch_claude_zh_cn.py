@@ -51,6 +51,7 @@ ONLINE_LOCALE_PRELOAD_TARGETS = [
 ONLINE_LOCALE_MARKER = "__claudeZhOnlineLocale"
 ONLINE_LOCALE_MAIN_MARKER = "__claudeZhOnlineLocaleMain"
 ONLINE_LOCALE_LOCK_MARKER = "__claudeZhLocaleLock"
+MENU_RUNTIME_MARKER = "__claudeZhMenuRuntimePatch"
 ONLINE_TRANSLATION_MAX_SOURCE_LEN = 240
 STRUCTURAL_JS_STRING_REPLACEMENTS = {
     "hour",
@@ -928,7 +929,34 @@ def get_main_process_menu_replacements(lang_code: str) -> dict[str, str]:
             "View": "查看",
             "Developer": "开发者",
             "Help": "帮助",
+            "New Conversation": "新对话",
+            "Settings…": "设置…",
+            "Settings...": "设置...",
+            "Close Window": "关闭窗口",
+            "Exit": "退出",
+            "Undo": "撤销",
+            "Redo": "重做",
+            "Cut": "剪切",
+            "Copy": "复制",
+            "Paste": "粘贴",
+            "Select All": "全选",
+            "Find": "查找",
+            "Find Next": "查找下一个",
+            "Find Previous": "查找上一个",
+            "Reload": "重新加载",
+            "Actual Size": "实际大小",
+            "Zoom In": "放大",
+            "Zoom Out": "缩小",
+            "Copy URL": "复制 URL",
             "Extensions": "扩展",
+            "Install Extension…": "安装扩展…",
+            "Install Extension...": "安装扩展...",
+            "Install Unpacked Extension…": "安装未打包的扩展…",
+            "Install Unpacked Extension...": "安装未打包的扩展...",
+            "Open Extensions Folder…": "打开扩展文件夹…",
+            "Open Extensions Folder...": "打开扩展文件夹...",
+            "Open Extension Settings Folder…": "打开扩展设置文件夹…",
+            "Open Extension Settings Folder...": "打开扩展设置文件夹...",
             "Open Developer Config File…": "打开开发者配置文件…",
             "Open Developer Config File...": "打开开发者配置文件...",
             "Configure Third-Party Inference…": "配置第三方推理…",
@@ -947,6 +975,13 @@ def get_main_process_menu_replacements(lang_code: str) -> dict[str, str]:
             "Record Performance Trace": "记录性能跟踪",
             "Write Main Process Heap Snapshot": "写入主进程堆快照",
             "Record Memory Trace (auto-stop)": "记录内存跟踪 (自动)",
+            "Open Documentation": "打开文档",
+            "Check for Updates…": "检查更新…",
+            "Check for Updates...": "检查更新...",
+            "Troubleshooting": "故障排除",
+            "Get Support": "获取支持",
+            "About…": "关于…",
+            "About...": "关于...",
         },
         "zh-TW": {
             "File": "檔案",
@@ -954,7 +989,34 @@ def get_main_process_menu_replacements(lang_code: str) -> dict[str, str]:
             "View": "檢視",
             "Developer": "開發者",
             "Help": "說明",
+            "New Conversation": "新對話",
+            "Settings…": "設定…",
+            "Settings...": "設定...",
+            "Close Window": "關閉視窗",
+            "Exit": "結束",
+            "Undo": "復原",
+            "Redo": "重做",
+            "Cut": "剪下",
+            "Copy": "複製",
+            "Paste": "貼上",
+            "Select All": "全選",
+            "Find": "尋找",
+            "Find Next": "尋找下一個",
+            "Find Previous": "尋找上一個",
+            "Reload": "重新載入",
+            "Actual Size": "實際大小",
+            "Zoom In": "放大",
+            "Zoom Out": "縮小",
+            "Copy URL": "複製 URL",
             "Extensions": "擴充功能",
+            "Install Extension…": "安裝擴充功能…",
+            "Install Extension...": "安裝擴充功能...",
+            "Install Unpacked Extension…": "安裝未封裝的擴充功能…",
+            "Install Unpacked Extension...": "安裝未封裝的擴充功能...",
+            "Open Extensions Folder…": "開啟擴充功能資料夾…",
+            "Open Extensions Folder...": "開啟擴充功能資料夾...",
+            "Open Extension Settings Folder…": "開啟擴充功能設定資料夾…",
+            "Open Extension Settings Folder...": "開啟擴充功能設定資料夾...",
             "Open Developer Config File…": "開啟開發者設定檔…",
             "Open Developer Config File...": "開啟開發者設定檔...",
             "Configure Third-Party Inference…": "設定第三方推理…",
@@ -973,6 +1035,13 @@ def get_main_process_menu_replacements(lang_code: str) -> dict[str, str]:
             "Record Performance Trace": "記錄效能追蹤",
             "Write Main Process Heap Snapshot": "寫入主行程堆積快照",
             "Record Memory Trace (auto-stop)": "記錄記憶體追蹤 (自動)",
+            "Open Documentation": "開啟文件",
+            "Check for Updates…": "檢查更新…",
+            "Check for Updates...": "檢查更新...",
+            "Troubleshooting": "疑難排解",
+            "Get Support": "取得支援",
+            "About…": "關於…",
+            "About...": "關於...",
         },
         "zh-HK": {
             "File": "檔案",
@@ -980,7 +1049,34 @@ def get_main_process_menu_replacements(lang_code: str) -> dict[str, str]:
             "View": "檢視",
             "Developer": "開發者",
             "Help": "說明",
+            "New Conversation": "新對話",
+            "Settings…": "設定…",
+            "Settings...": "設定...",
+            "Close Window": "關閉視窗",
+            "Exit": "結束",
+            "Undo": "還原",
+            "Redo": "重做",
+            "Cut": "剪下",
+            "Copy": "複製",
+            "Paste": "貼上",
+            "Select All": "全選",
+            "Find": "尋找",
+            "Find Next": "尋找下一個",
+            "Find Previous": "尋找上一個",
+            "Reload": "重新載入",
+            "Actual Size": "實際大小",
+            "Zoom In": "放大",
+            "Zoom Out": "縮小",
+            "Copy URL": "複製 URL",
             "Extensions": "擴充功能",
+            "Install Extension…": "安裝擴充功能…",
+            "Install Extension...": "安裝擴充功能...",
+            "Install Unpacked Extension…": "安裝未封裝的擴充功能…",
+            "Install Unpacked Extension...": "安裝未封裝的擴充功能...",
+            "Open Extensions Folder…": "開啟擴充功能資料夾…",
+            "Open Extensions Folder...": "開啟擴充功能資料夾...",
+            "Open Extension Settings Folder…": "開啟擴充功能設定資料夾…",
+            "Open Extension Settings Folder...": "開啟擴充功能設定資料夾...",
             "Open Developer Config File…": "開啟開發者設定檔…",
             "Open Developer Config File...": "開啟開發者設定檔...",
             "Configure Third-Party Inference…": "設定第三方推理…",
@@ -999,6 +1095,13 @@ def get_main_process_menu_replacements(lang_code: str) -> dict[str, str]:
             "Record Performance Trace": "記錄效能追蹤",
             "Write Main Process Heap Snapshot": "寫入主行程堆積快照",
             "Record Memory Trace (auto-stop)": "記錄記憶體追蹤 (自動)",
+            "Open Documentation": "開啟文件",
+            "Check for Updates…": "檢查更新…",
+            "Check for Updates...": "檢查更新...",
+            "Troubleshooting": "疑難排解",
+            "Get Support": "取得支援",
+            "About…": "關於…",
+            "About...": "關於...",
         },
     }
     return replacements_by_lang[lang_code]
@@ -1021,6 +1124,37 @@ def get_main_process_menu_intl_replacements(lang_code: str) -> dict[str, str]:
             "PW5U8NgTto": "打开 MCP 日志文件...",
             "uKCcuVd1Yt": "重新加载 MCP 配置",
             "9GRz7bC+rr": "配置第三方推理…",
+            "baGq3gy8z1": "新对话",
+            "ODySlGptaj": "设置…",
+            "IHsCTXnnSv": "关闭窗口",
+            "7fdcqxofEs": "退出",
+            "dKX0bpR+a2": "退出",
+            "Xda79B7DPP": "撤销",
+            "fFJxOwJRj2": "撤销",
+            "R0/CZEcsoI": "重做",
+            "3ML3xT+gEV": "重做",
+            "TH+W2Ad73P": "剪切",
+            "4MLbtbVfJv": "剪切",
+            "+7sd9hoyZA": "复制",
+            "3unrKzH4zB": "复制",
+            "JVwNvMZjVT": "粘贴",
+            "KAo3lt5Hv+": "粘贴",
+            "8YQEOfuaGO": "全选",
+            "grarAzxOkG": "全选",
+            "O3rtEd7aMd": "查找",
+            "Ko/2Ml7mZG": "重新加载此页面",
+            "+/cwsayrqk": "实际大小",
+            "Z9g5m/V9Nq": "放大",
+            "XZ36+EBE5/": "缩小",
+            "WvMIEFradI": "复制链接",
+            "l6/rglN9Fm": "复制 URL",
+            "YgfdkMAdfQ": "打开硬件伙伴…",
+            "Q0f46SlJw": "扩展",
+            "j66cdL4EK5": "打开文档",
+            "mRXjxhS6p4": "检查更新…",
+            "4XmExNuKUb": "故障排除",
+            "XfMPtFNO8C": "获取支持",
+            "5DUIVR3fVi": "关于...",
         },
         "zh-TW": {
             "0tZLEYF8mJ": "開發者",
@@ -1037,6 +1171,37 @@ def get_main_process_menu_intl_replacements(lang_code: str) -> dict[str, str]:
             "PW5U8NgTto": "開啟 MCP 記錄檔...",
             "uKCcuVd1Yt": "重新載入 MCP 設定",
             "9GRz7bC+rr": "設定第三方推理…",
+            "baGq3gy8z1": "新對話",
+            "ODySlGptaj": "設定…",
+            "IHsCTXnnSv": "關閉視窗",
+            "7fdcqxofEs": "結束",
+            "dKX0bpR+a2": "結束",
+            "Xda79B7DPP": "復原",
+            "fFJxOwJRj2": "復原",
+            "R0/CZEcsoI": "重做",
+            "3ML3xT+gEV": "重做",
+            "TH+W2Ad73P": "剪下",
+            "4MLbtbVfJv": "剪下",
+            "+7sd9hoyZA": "複製",
+            "3unrKzH4zB": "複製",
+            "JVwNvMZjVT": "貼上",
+            "KAo3lt5Hv+": "貼上",
+            "8YQEOfuaGO": "全選",
+            "grarAzxOkG": "全選",
+            "O3rtEd7aMd": "尋找",
+            "Ko/2Ml7mZG": "重新載入此頁面",
+            "+/cwsayrqk": "實際大小",
+            "Z9g5m/V9Nq": "放大",
+            "XZ36+EBE5/": "縮小",
+            "WvMIEFradI": "複製連結",
+            "l6/rglN9Fm": "複製 URL",
+            "YgfdkMAdfQ": "開啟硬體夥伴…",
+            "Q0f46SlJw": "擴充功能",
+            "j66cdL4EK5": "開啟文件",
+            "mRXjxhS6p4": "檢查更新…",
+            "4XmExNuKUb": "疑難排解",
+            "XfMPtFNO8C": "取得支援",
+            "5DUIVR3fVi": "關於...",
         },
         "zh-HK": {
             "0tZLEYF8mJ": "開發者",
@@ -1053,35 +1218,173 @@ def get_main_process_menu_intl_replacements(lang_code: str) -> dict[str, str]:
             "PW5U8NgTto": "開啟 MCP 記錄檔...",
             "uKCcuVd1Yt": "重新載入 MCP 設定",
             "9GRz7bC+rr": "設定第三方推理…",
+            "baGq3gy8z1": "新對話",
+            "ODySlGptaj": "設定…",
+            "IHsCTXnnSv": "關閉視窗",
+            "7fdcqxofEs": "結束",
+            "dKX0bpR+a2": "結束",
+            "Xda79B7DPP": "還原",
+            "fFJxOwJRj2": "還原",
+            "R0/CZEcsoI": "重做",
+            "3ML3xT+gEV": "重做",
+            "TH+W2Ad73P": "剪下",
+            "4MLbtbVfJv": "剪下",
+            "+7sd9hoyZA": "複製",
+            "3unrKzH4zB": "複製",
+            "JVwNvMZjVT": "貼上",
+            "KAo3lt5Hv+": "貼上",
+            "8YQEOfuaGO": "全選",
+            "grarAzxOkG": "全選",
+            "O3rtEd7aMd": "尋找",
+            "Ko/2Ml7mZG": "重新載入此頁面",
+            "+/cwsayrqk": "實際大小",
+            "Z9g5m/V9Nq": "放大",
+            "XZ36+EBE5/": "縮小",
+            "WvMIEFradI": "複製連結",
+            "l6/rglN9Fm": "複製 URL",
+            "YgfdkMAdfQ": "開啟硬件夥伴…",
+            "Q0f46SlJw": "擴充功能",
+            "j66cdL4EK5": "開啟文件",
+            "mRXjxhS6p4": "檢查更新…",
+            "4XmExNuKUb": "疑難排解",
+            "XfMPtFNO8C": "取得支援",
+            "5DUIVR3fVi": "關於...",
         },
     }
     return replacements_by_lang[lang_code]
+
+
+def get_main_process_menu_role_replacements(lang_code: str) -> dict[str, str]:
+    replacements_by_lang = {
+        "zh-CN": {
+            "about": "关于...",
+            "close": "关闭窗口",
+            "copy": "复制",
+            "cut": "剪切",
+            "find": "查找",
+            "findNext": "查找下一个",
+            "findPrevious": "查找上一个",
+            "forceReload": "强制重新加载",
+            "paste": "粘贴",
+            "preferences": "设置...",
+            "quit": "退出",
+            "redo": "重做",
+            "reload": "重新加载",
+            "resetZoom": "实际大小",
+            "selectAll": "全选",
+            "settings": "设置...",
+            "undo": "撤销",
+            "zoomIn": "放大",
+            "zoomOut": "缩小",
+        },
+        "zh-TW": {
+            "about": "關於...",
+            "close": "關閉視窗",
+            "copy": "複製",
+            "cut": "剪下",
+            "find": "尋找",
+            "findNext": "尋找下一個",
+            "findPrevious": "尋找上一個",
+            "forceReload": "強制重新載入",
+            "paste": "貼上",
+            "preferences": "設定...",
+            "quit": "結束",
+            "redo": "重做",
+            "reload": "重新載入",
+            "resetZoom": "實際大小",
+            "selectAll": "全選",
+            "settings": "設定...",
+            "undo": "復原",
+            "zoomIn": "放大",
+            "zoomOut": "縮小",
+        },
+        "zh-HK": {
+            "about": "關於...",
+            "close": "關閉視窗",
+            "copy": "複製",
+            "cut": "剪下",
+            "find": "尋找",
+            "findNext": "尋找下一個",
+            "findPrevious": "尋找上一個",
+            "forceReload": "強制重新載入",
+            "paste": "貼上",
+            "preferences": "設定...",
+            "quit": "結束",
+            "redo": "重做",
+            "reload": "重新載入",
+            "resetZoom": "實際大小",
+            "selectAll": "全選",
+            "settings": "設定...",
+            "undo": "還原",
+            "zoomIn": "放大",
+            "zoomOut": "縮小",
+        },
+    }
+    return replacements_by_lang[lang_code]
+
+
+def build_menu_runtime_patch(lang_code: str) -> str:
+    label_map = get_main_process_menu_replacements(lang_code)
+    role_map = get_main_process_menu_role_replacements(lang_code)
+    label_json = json.dumps(label_map, ensure_ascii=False, separators=(",", ":"))
+    role_json = json.dumps(role_map, ensure_ascii=False, separators=(",", ":"))
+    return (
+        f';(()=>{{try{{const e=require("electron"),M={label_json},R={role_json};'
+        f'if(!e||!e.Menu||e.Menu.__claudeZhMenuRuntimePatch)return;'
+        f'const n=s=>String(s||"").replace(/\\u2026/g,"...").trim(),'
+        f't=s=>M[s]||M[n(s)]||M[String(s||"").replace(/\\.\\.\\.$/,"…")];'
+        f'function w(a){{if(!Array.isArray(a))return;for(const i of a){{if(!i||typeof i!=="object")continue;'
+        f'if(i.label){{const l=t(i.label);if(l)i.label=l}}'
+        f'const r=i.role==null?"":String(i.role),k=R[r]||R[r.charAt(0).toLowerCase()+r.slice(1)]||R[r.toLowerCase()];'
+        f'if(!i.label&&k)i.label=k;if(Array.isArray(i.submenu))w(i.submenu)}}}}'
+        f'const b=e.Menu.buildFromTemplate;e.Menu.buildFromTemplate=function(a){{try{{w(a)}}catch{{}}return b.call(this,a)}};'
+        f'if(e.MenuItem&&!e.MenuItem.__claudeZhMenuRuntimePatch){{const I=e.MenuItem;'
+        f'e.MenuItem=function(o){{try{{w([o])}}catch{{}}return new I(o)}};'
+        f'e.MenuItem.prototype=I.prototype;Object.setPrototypeOf(e.MenuItem,I);'
+        f'Object.defineProperty(e.MenuItem,"__claudeZhMenuRuntimePatch",{{value:!0}})}}'
+        f'Object.defineProperty(e.Menu,"__claudeZhMenuRuntimePatch",{{value:!0}})}}catch{{}}}})();/*{MENU_RUNTIME_MARKER}*/'
+    )
+
+
+def strip_menu_runtime_patch(text: str) -> tuple[str, bool]:
+    pattern = re.compile(
+        r';\(\(\)=>\{try\{const e=require\("electron"\),M=.*?/\*'
+        + re.escape(MENU_RUNTIME_MARKER)
+        + r'\*/',
+        re.DOTALL,
+    )
+    return pattern.subn("", text, count=1)
 
 
 def replace_menu_intl_message_by_id(text: str, message_id: str, target: str) -> tuple[str, int]:
     updated = text
     count = 0
     needle = f'id:"{message_id}"'
-    pattern = re.compile(
-        r'[A-Za-z_$][A-Za-z0-9_$]*\(\)\.formatMessage\(\{defaultMessage:"(?:\\.|[^"\\])*",id:"'
-        + re.escape(message_id)
-        + r'"(?:,description:"(?:\\.|[^"\\])*")?\}\)'
-    )
     search_start = 0
     while True:
         id_index = updated.find(needle, search_start)
         if id_index < 0:
             break
 
-        window_start = max(0, id_index - 600)
-        window_end = min(len(updated), id_index + 600)
-        match = pattern.search(updated[window_start:window_end])
-        if not match:
+        call_start = updated.rfind(".formatMessage({", 0, id_index)
+        if call_start < 0:
+            search_start = id_index + len(needle)
+            continue
+        receiver_start = call_start - 1
+        while receiver_start >= 0 and re.match(r"[A-Za-z0-9_$().]", updated[receiver_start]):
+            receiver_start -= 1
+        receiver_start += 1
+        call_end = updated.find("})", id_index)
+        if call_end < 0:
+            search_start = id_index + len(needle)
+            continue
+        absolute_start = receiver_start
+        absolute_end = call_end + 2
+        call_text = updated[absolute_start:absolute_end]
+        if "formatMessage({" not in call_text or needle not in call_text:
             search_start = id_index + len(needle)
             continue
 
-        absolute_start = window_start + match.start()
-        absolute_end = window_start + match.end()
         literal = json.dumps(target, ensure_ascii=False)
         updated = updated[:absolute_start] + literal + updated[absolute_end:]
         count += 1
@@ -1128,9 +1431,12 @@ def patch_length_preserving_main_process_menu_labels(app: Path, lang_code: str) 
     text = content.decode("utf-8")
     patched = text
     count = 0
+    skipped_count = 0
     for source, target in sorted(replacements.items(), key=lambda item: len(item[0]), reverse=True):
         patched, occurrences = replace_menu_literal_length_preserving(patched, source, target)
         count += occurrences
+        if occurrences == 0 and source in patched and len(target.encode("utf-8")) > len(source.encode("utf-8")):
+            skipped_count += patched.count(source)
 
     patched_content = patched.encode("utf-8")
     if patched_content == content:
@@ -1146,6 +1452,8 @@ def patch_length_preserving_main_process_menu_labels(app: Path, lang_code: str) 
     data[: len(updated_header)] = updated_header
     path.write_bytes(data)
     update_electron_asar_integrity(app, updated_header_string)
+    if skipped_count:
+        print(f"Skipped {skipped_count} main-process menu labels that are too long for length-preserving mode")
     print(f"Patched length-preserving main-process menu labels: {count} replacements")
 
 
@@ -1168,7 +1476,9 @@ def patch_hardcoded_main_process_menu_labels(app: Path, lang_code: str) -> None:
     patched = text
     count = 0
     intl_count = 0
+    runtime_count = 0
     repair_count = 0
+    patched, removed_runtime_patch = strip_menu_runtime_patch(patched)
     unsafe_repairs = {
         "文件": "File",
         "檔案": "File",
@@ -1214,15 +1524,23 @@ def patch_hardcoded_main_process_menu_labels(app: Path, lang_code: str) -> None:
         patched, occurrences = pattern.subn(replace_match, patched)
         count += occurrences
 
-    if count == 0 and intl_count == 0 and repair_count == 0:
+    if MENU_RUNTIME_MARKER not in patched:
+        patched = build_menu_runtime_patch(lang_code) + patched
+        runtime_count = 1
+    elif removed_runtime_patch:
+        runtime_count = 1
+
+    if count == 0 and intl_count == 0 and runtime_count == 0 and repair_count == 0:
         print("Hardcoded main-process menu labels already patched")
         return
+    if intl_count == 0 and count == 0 and runtime_count == 0:
+        raise SystemExit("Could not patch main-process menu labels; Claude's menu bundle format may have changed.")
 
     patched_content = patched.encode("utf-8")
     replace_asar_file_content(app, ASAR_PATCH_TARGET, patched_content)
     if repair_count:
         print(f"Repaired unsafe short main-process menu replacements: {repair_count} occurrences")
-    print(f"Patched hardcoded main-process menu labels: {count + intl_count} replacements")
+    print(f"Patched hardcoded main-process menu labels: {count + intl_count} replacements, runtime patch: {runtime_count}")
 
 
 def merge_frontend_locale(app: Path, lang_code: str) -> tuple[int, int, int]:
