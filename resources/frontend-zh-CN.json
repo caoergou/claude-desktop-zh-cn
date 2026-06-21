@@ -3235,6 +3235,8 @@
   "C7GMZVjSu3": "对于偶尔出现的尖峰",
   "C7Sx4g/l21": "为你的内容命名",
   "C7tuVUr220": "同步正在进行中。完成后页面将自动更新。",
+  "ChatAdvancedFileAnalysisEnabled": "高级文件分析",
+  "ChatAdvancedFileAnalysisEnabledHint": "允许 Claude 在本地沙箱中运行代码，以分析它无法原生读取的附件文件（例如 Excel 和 PowerPoint），并执行内联数据分析。沙箱只能读取附加到对话的文件，且无法访问网络。默认关闭。",
   "ChatCodeExecEnabled": "允许在聊天中执行代码",
   "ChatCodeExecEnabledHint": "允许 Claude 在聊天对话的本地沙箱中运行代码。沙箱只能读取附加到对话的文件，且无法访问网络。默认关闭；关闭时，Claude 无法分析需要在聊天中进行计算的电子表格或其他文件。",
   "C81/uGekIK": "注销",
