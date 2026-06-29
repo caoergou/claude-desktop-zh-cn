@@ -27,7 +27,7 @@ $AsarPatchTarget = ".vite/build/index.js"
 $AsarIntegrityBlockSize = 4 * 1024 * 1024
 $OnlineLocaleMainMarker = "__claudeZhOnlineLocaleMain"
 $MenuRuntimeMarker = "__claudeZhMenuRuntimePatch"
-$OnlineTranslationMaxSourceLength = 240
+$OnlineTranslationMaxSourceLength = 1000
 $script:CurrentBackupSetPath = $null
 $script:DetectedUnpackagedClaudePaths = @()
 $script:DetectedMultipleClaudeInstalls = $false
@@ -1263,7 +1263,7 @@ function Test-OnlineDomTranslationEntry {
     if ($Source.Length -gt $OnlineTranslationMaxSourceLength) {
         return $false
     }
-    foreach ($fragment in @("<", "{", "`n", "http://", "https://")) {
+    foreach ($fragment in @("{", "`n")) {
         if ($Source.Contains($fragment) -or $Target.Contains($fragment)) {
             return $false
         }
@@ -1324,15 +1324,33 @@ function Get-OnlineDomTranslationScript {
     if ($Language -eq "zh-CN") {
         $selectedText = "已选择 `$1 项"
         $deleteSelectedText = "删除 `$1 个所选项目"
+        $updatedMinuteText = "`$1 分钟前更新"
+        $updatedHourText = "`$1 小时前更新"
+        $updatedDayText = "`$1 天前更新"
+        $updatedWeekText = "`$1 周前更新"
+        $updatedMonthText = "`$1 个月前更新"
+        $updatedYearText = "`$1 年前更新"
     } else {
         $selectedText = "已選擇 `$1 項"
         $deleteSelectedText = "刪除 `$1 個所選項目"
+        $updatedMinuteText = "`$1 分鐘前更新"
+        $updatedHourText = "`$1 小時前更新"
+        $updatedDayText = "`$1 天前更新"
+        $updatedWeekText = "`$1 週前更新"
+        $updatedMonthText = "`$1 個月前更新"
+        $updatedYearText = "`$1 年前更新"
     }
     $selectedTextJson = $selectedText | ConvertTo-Json -Compress
     $deleteSelectedTextJson = $deleteSelectedText | ConvertTo-Json -Compress
+    $updatedMinuteTextJson = $updatedMinuteText | ConvertTo-Json -Compress
+    $updatedHourTextJson = $updatedHourText | ConvertTo-Json -Compress
+    $updatedDayTextJson = $updatedDayText | ConvertTo-Json -Compress
+    $updatedWeekTextJson = $updatedWeekText | ConvertTo-Json -Compress
+    $updatedMonthTextJson = $updatedMonthText | ConvertTo-Json -Compress
+    $updatedYearTextJson = $updatedYearText | ConvertTo-Json -Compress
     $template = @'
 (()=>{try{
-const L=__LANGUAGE__,M=__MAPPING__,ST=__SELECTED_TEXT__,DST=__DELETE_SELECTED_TEXT__;
+const L=__LANGUAGE__,M=__MAPPING__,ST=__SELECTED_TEXT__,DST=__DELETE_SELECTED_TEXT__,UMI=__UPDATED_MINUTE_TEXT__,UH=__UPDATED_HOUR_TEXT__,UD=__UPDATED_DAY_TEXT__,UW=__UPDATED_WEEK_TEXT__,UMO=__UPDATED_MONTH_TEXT__,UY=__UPDATED_YEAR_TEXT__;
 localStorage.setItem("spa:locale",L);
 document.documentElement&&document.documentElement.setAttribute("lang",L);
 const N=s=>(s||"").replace(/\s+/g," ").trim();
@@ -1354,6 +1372,12 @@ const G=[
 [/^(\d+) selected$/,ST],
 [/^Delete (\d+) selected item$/,DST],
 [/^Delete (\d+) selected items$/,DST],
+[/^Updated (\d+) minutes? ago$/,UMI],
+[/^Updated (\d+) hours? ago$/,UH],
+[/^Updated (\d+) days? ago$/,UD],
+[/^Updated (\d+) weeks? ago$/,UW],
+[/^Updated (\d+) months? ago$/,UMO],
+[/^Updated (\d+) years? ago$/,UY],
 [/^Mon$/,"周一"],[/^Tue$/,"周二"],[/^Wed$/,"周三"],[/^Thu$/,"周四"],[/^Fri$/,"周五"],[/^Sat$/,"周六"],[/^Sun$/,"周日"]
 ];
 const R=s=>{const n=N(s);if(M[n])return M[n];for(const [r,t] of G){const m=n.match(r);if(m)return t.replace("$1",m[1])}};
@@ -1363,7 +1387,7 @@ T();
 new MutationObserver(()=>{clearTimeout(window.__claudeZhDomTimer);window.__claudeZhDomTimer=setTimeout(T,30)}).observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true});
 }catch(e){}})()
 '@
-    return $template.Replace("__LANGUAGE__", $languageJson).Replace("__MAPPING__", $mappingJson).Replace("__SELECTED_TEXT__", $selectedTextJson).Replace("__DELETE_SELECTED_TEXT__", $deleteSelectedTextJson)
+    return $template.Replace("__LANGUAGE__", $languageJson).Replace("__MAPPING__", $mappingJson).Replace("__SELECTED_TEXT__", $selectedTextJson).Replace("__DELETE_SELECTED_TEXT__", $deleteSelectedTextJson).Replace("__UPDATED_MINUTE_TEXT__", $updatedMinuteTextJson).Replace("__UPDATED_HOUR_TEXT__", $updatedHourTextJson).Replace("__UPDATED_DAY_TEXT__", $updatedDayTextJson).Replace("__UPDATED_WEEK_TEXT__", $updatedWeekTextJson).Replace("__UPDATED_MONTH_TEXT__", $updatedMonthTextJson).Replace("__UPDATED_YEAR_TEXT__", $updatedYearTextJson)
 }
 
 function Remove-ExistingOnlineDomTranslationPatch {

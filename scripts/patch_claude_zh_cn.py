@@ -52,7 +52,7 @@ ONLINE_LOCALE_MARKER = "__claudeZhOnlineLocale"
 ONLINE_LOCALE_MAIN_MARKER = "__claudeZhOnlineLocaleMain"
 ONLINE_LOCALE_LOCK_MARKER = "__claudeZhLocaleLock"
 MENU_RUNTIME_MARKER = "__claudeZhMenuRuntimePatch"
-ONLINE_TRANSLATION_MAX_SOURCE_LEN = 240
+ONLINE_TRANSLATION_MAX_SOURCE_LEN = 1000
 STRUCTURAL_JS_STRING_REPLACEMENTS = {
     "hour",
     "hours",
@@ -500,7 +500,7 @@ def is_online_dom_translation_entry(source: str, target: str) -> bool:
         return False
     if len(source) > ONLINE_TRANSLATION_MAX_SOURCE_LEN:
         return False
-    blocked_fragments = ["<", "{", "\n", "http://", "https://"]
+    blocked_fragments = ["{", "\n"]
     return not any(fragment in source or fragment in target for fragment in blocked_fragments)
 
 
@@ -537,6 +537,12 @@ def build_online_dom_translation_script(lang_code: str, mapping: dict[str, str])
         delete_named_session_text = "“$1”将被永久删除。此操作无法撤消。"
         archive_selected_tasks_text = "归档所选任务？"
         archive_tasks_moved_text = "$1 个任务将被移至“已归档”。"
+        updated_minute_text = "$1 分钟前更新"
+        updated_hour_text = "$1 小时前更新"
+        updated_day_text = "$1 天前更新"
+        updated_week_text = "$1 周前更新"
+        updated_month_text = "$1 个月前更新"
+        updated_year_text = "$1 年前更新"
     else:
         selected_text = "已選擇 $1 項"
         delete_selected_text = "刪除 $1 個所選項目"
@@ -544,6 +550,12 @@ def build_online_dom_translation_script(lang_code: str, mapping: dict[str, str])
         delete_named_session_text = "「$1」將被永久刪除。此操作無法復原。"
         archive_selected_tasks_text = "歸檔所選任務？"
         archive_tasks_moved_text = "$1 個任務將被移至「已歸檔」。"
+        updated_minute_text = "$1 分鐘前更新"
+        updated_hour_text = "$1 小時前更新"
+        updated_day_text = "$1 天前更新"
+        updated_week_text = "$1 週前更新"
+        updated_month_text = "$1 個月前更新"
+        updated_year_text = "$1 年前更新"
     dynamic_rules = "".join((
         f'[/^(\\d+) selected$/,"{selected_text}"],'
         f'[/^Delete (\\d+) selected item$/,"{delete_selected_text}"],'
@@ -553,6 +565,12 @@ def build_online_dom_translation_script(lang_code: str, mapping: dict[str, str])
         f'[/^Archive selected task\\?$/,"{archive_selected_tasks_text}"],'
         f'[/^Archive selected tasks\\?$/,"{archive_selected_tasks_text}"],'
         f'[/^(\\d+) tasks? will be moved to Archived\\.$/,"{archive_tasks_moved_text}"],'
+        f'[/^Updated (\\d+) minutes? ago$/,"{updated_minute_text}"],'
+        f'[/^Updated (\\d+) hours? ago$/,"{updated_hour_text}"],'
+        f'[/^Updated (\\d+) days? ago$/,"{updated_day_text}"],'
+        f'[/^Updated (\\d+) weeks? ago$/,"{updated_week_text}"],'
+        f'[/^Updated (\\d+) months? ago$/,"{updated_month_text}"],'
+        f'[/^Updated (\\d+) years? ago$/,"{updated_year_text}"],'
         '[/^Mon$/,"周一"],[/^Tue$/,"周二"],[/^Wed$/,"周三"],[/^Thu$/,"周四"],'
         '[/^Fri$/,"周五"],[/^Sat$/,"周六"],[/^Sun$/,"周日"]'
     ))

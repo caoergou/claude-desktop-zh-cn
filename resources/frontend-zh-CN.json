@@ -13179,7 +13179,7 @@
   "tSYisYSlsV": "A value is already saved. Enter a new one to replace it.",
   "tSvU6XMSfU": "查看你组织的使用情况和活动指标",
   "tSwEpl8XcL": "<b>{count, plural, one {# session stuck} other {# sessions stuck}}</b> — failed on 3 different runners each. Auto-recovery exhausted. Check runner logs, then retry or dismiss.",
-  "tT9FhdK84Y": "View and manage memory",
+  "tT9FhdK84Y": "查看和管理记忆",
   "tTCSuAGxCA": "No project snapshot is available yet. Try again once a version has been captured.",
   "tTVI3GQeyu": "创建了一个文件",
   "tTjaNMy6AH": "添加语气、格式或规则来指导 Claude 如何工作。",

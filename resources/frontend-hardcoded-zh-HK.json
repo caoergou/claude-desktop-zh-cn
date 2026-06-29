@@ -1129,7 +1129,7 @@
   ],
   [
     "Requires a model that supports the classifier (Claude 4.6+). Older models show the option greyed out.",
-    "需要支援該分類器的模型（Claude 4.6+）。較舊模型會將此選項顯示為灰色。"
+    "需要支援该分類器的模型（Claude 4.6+）。較舊模型会将此选项顯示為灰色。"
   ],
   [
     "This is the permissive opposite of the per-tool ask policy above; both may be set.",
@@ -1250,5 +1250,389 @@
   [
     "Speed",
     "速度"
+  ],
+  [
+    "Trusted devices",
+    "受信任裝置"
+  ],
+  [
+    "Devices that can control your local machine through remote sessions.",
+    "可透過遙距工作階段控制你本機的裝置。"
+  ],
+  [
+    "Help improve our AI models",
+    "協助改進我們的 AI 模型"
+  ],
+  [
+    "Let Claude search the connector directory and surface ones relevant to your conversation.",
+    "讓 Claude 搜尋連接器目錄，並顯示與你的對話相關的連接器。"
+  ],
+  [
+    "When safety measures flag a message, automatically switch to a different model to keep chatting.",
+    "當安全措施標記某則訊息時，自動切換到其他模型以繼續聊天。"
+  ],
+  [
+    "When off, your chat will pause instead.",
+    "關閉後，你的聊天將暫停。"
+  ],
+  [
+    "When off, your session will pause instead. Applies to web and remote sessions.",
+    "關閉後，你的工作階段將暫停。適用於網頁和遙距工作階段。"
+  ],
+  [
+    "View and manage memory",
+    "查看和管理記憶"
+  ],
+  [
+    "Reduce animation in streaming responses and other interface elements.",
+    "減少串流回應和其他介面元素中的動畫。"
+  ],
+  [
+    "When safety measures flag a message, automatically switch to a different model to keep chatting. When off, your chat will pause instead.",
+    "當安全措施標記某則訊息時，自動切換到其他模型以繼續聊天。關閉後，你的聊天將暫停。"
+  ],
+  [
+    "When safety measures flag a message, automatically switch to a different model to keep chatting. When off, your session will pause instead. Applies to web and remote sessions.",
+    "當安全措施標記某則訊息時，自動切換到其他模型以繼續聊天。關閉後，你的工作階段將暫停。適用於網頁和遙距工作階段。"
+  ],
+  [
+    "Auto-populate the model picker from /v1/models at launch; when this key isn't set in the config, discovery is skipped if the model list below makes it unnecessary.",
+    "啟動時從 /v1/models 自動填入模型選擇器；如果設定中未設定此鍵，且下方的模型清單已使探索變得不必要，則會跳過探索。"
+  ],
+  [
+    "Applies to both the Cowork and Code tabs. In the Cowork tab it governs the sandbox's web fetch, shell commands, and package installs. In the Code tab it is translated into Claude Code's network sandbox allowlist (claude.com); a separately deployed Claude Code managed-settings file on the endpoint takes precedence by default.",
+    "適用於 Cowork 和 Code 分頁。在 Cowork 分頁中，它控制沙盒的網頁擷取、shell 命令和套件安裝。在 Code 分頁中，它會轉換為 Claude Code 的網絡沙盒允許清單（claude.com）；預設情況下，端點上另行部署的 Claude Code 受管理設定檔優先。"
+  ],
+  [
+    "Does not apply to Web Search, which runs server-side at your inference provider rather than from the sandbox.",
+    "不適用於 Web Search；它在你的推論提供者伺服器端執行，而不是從沙盒中執行。"
+  ],
+  [
+    "Only affects tool calls. Inference and MCP traffic are covered by their own allowlists elsewhere.",
+    "僅影響工具呼叫。推論和 MCP 流量由其他位置的各自允許清單控制。"
+  ],
+  [
+    "When unset, only the inference endpoint is reachable from the sandbox; the agent's package installs (pip/npm) and web fetches will fail with a 403.",
+    "未設定時，沙盒只能連到推論端點；代理程式的套件安裝（pip/npm）和網頁擷取會因 403 失敗。"
+  ],
+  [
+    "Accepts exact hostnames ( api.github.com ), wildcards ( *.corp.com matches one subdomain level), and * to allow all. *.corp.com matches docs.corp.com but not corp.com itself; add both if you need the apex. IP literals and localhost always resolve regardless of this list; this is a public-egress filter, not a sandbox.",
+    "接受精確主機名稱（api.github.com）、萬用字元（*.corp.com 符合一層子網域）以及用於允許全部的 *。*.corp.com 符合 docs.corp.com，但不符合 corp.com 本身；如果需要根網域，請兩者都新增。IP 字面值和 localhost 一律可解析，不受此清單影響；這是公開輸出過濾器，不是沙盒。"
+  ],
+  [
+    "Hosts you add here also need to be open on your network firewall. See Egress Requirements for the full allowlist.",
+    "你在這裡新增的主機還需要在網絡防火牆中開放。完整允許清單請參閱「輸出要求」。"
+  ],
+  [
+    "Folders users may attach as a workspace. Leave unset for unrestricted access. Supports ~ and a fixed set of environment variables.",
+    "使用者可作為工作區附加的資料夾。留空則不限制存取。支援 ~ 和一組固定的環境變數。"
+  ],
+  [
+    "Paths can reference ~ and these environment variables, expanded per user: %OneDrive%, %OneDriveCommercial%, %OneDriveConsumer%, %APPDATA%, %LOCALAPPDATA%, %USERNAME%, %XDG_DOCUMENTS_DIR%. The set is fixed; an entry that references any other %VAR%, or one that is unset on the device, is ignored.",
+    "路徑可以引用 ~ 和這些環境變數，並按使用者展開：%OneDrive%、%OneDriveCommercial%、%OneDriveConsumer%、%APPDATA%、%LOCALAPPDATA%、%USERNAME%、%XDG_DOCUMENTS_DIR%。該集合是固定的；引用其他 %VAR% 或裝置上未設定變數的項目會被忽略。"
+  ],
+  [
+    "When enabled, users can select Auto mode (Code tab) / Act without asking (Cowork tab). Claude runs a safety classifier on each action and only prompts for approval on actions it judges risky, instead of following the static per-tool policy.",
+    "啟用後，使用者可以選擇自動模式（Code 分頁）/ 無需詢問即可操作（Cowork 分頁）。Claude 會對每個操作執行安全分類器，並且只在判定為有風險的操作上要求核准，而不是遵循靜態的按工具政策。"
+  ],
+  [
+    "Requires a model that supports the classifier (Claude 4.6+). Older models show the option greyed out. builtinToolPolicy and this key may both be set; Auto mode is a user-selectable option alongside the default policy, not a replacement for it.",
+    "需要支援該分類器的模型（Claude 4.6+）。較舊模型會將此選項顯示為灰色。builtinToolPolicy 和此鍵可以同時設定；自動模式是預設政策旁邊的使用者可選項，而不是它的替代品。"
+  ],
+  [
+    "In the Code tab, a separately deployed Claude Code managed-settings file that sets disableAutoMode to \"disable\" overrides this key and keeps Auto mode hidden.",
+    "在 Code 分頁中，如果另行部署的 Claude Code 受管理設定檔將 disableAutoMode 設為 \"disable\"，則會覆寫此鍵並保持隱藏自動模式。"
+  ],
+  [
+    "Disable bundled skills and workflows",
+    "停用內建技能和工作流程"
+  ],
+  [
+    "Disables Claude Code's bundled skills and workflows (deep-research and similar). Use where they cannot function, for instance when WebFetch is egress-blocked and the gateway does not forward the WebSearch server tool.",
+    "停用 Claude Code 內建的技能和工作流程（deep-research 及類似功能）。適用於它們無法運作的情境，例如 WebFetch 被輸出阻擋且網關未轉發 WebSearch 伺服器工具時。"
+  ],
+  [
+    "CHAT RESTRICTIONS",
+    "聊天限制"
+  ],
+  [
+    "Advanced file analysis",
+    "進階檔案分析"
+  ],
+  [
+    "Beta",
+    "測試版"
+  ],
+  [
+    "Allow Claude to run code in a local sandbox to analyze attached files it can't read natively — like Excel and PowerPoint — and perform inline data analysis. The sandbox can only read files attached to the conversation and has no network access. Off by default.",
+    "允許 Claude 在本機沙盒中執行代碼，以分析它無法原生讀取的附件檔案，例如 Excel 和 PowerPoint，並執行內嵌數據分析。沙盒只能讀取附加到對話中的檔案，且沒有網絡存取權限。預設關閉。"
+  ],
+  [
+    "For OAuth-authenticated entries, the app builds the redirect URI as http://<callbackHost>:<callbackPort>/callback ; register that exact value with the OAuth provider. Tokens refresh automatically during a session, so users aren't interrupted when the initial access token expires.",
+    "對於透過 OAuth 驗證的項目，應用程式會將重新導向 URI 建構為 http://<callbackHost>:<callbackPort>/callback；請在 OAuth 提供者處註冊這個精確值。權杖會在工作階段期間自動重新整理，因此初始存取權杖過期時不會打斷使用者。"
+  ],
+  [
+    "toolPolicy locks the per-tool approval state. \"blocked\" removes the tool from the session and labels it admin-blocked. \"ask\" requires approval on every call (Allow once / Deny only; no persistent always-allow). \"allow\" pre-approves. Tools not listed follow the user's choice: the prompt offers a persistent Always allow, except for tools that can modify data, which instead show a session-scoped Allow for this task alongside Allow for all tasks with a malicious-instruction warning. In the Code tab, blocked / ask are forwarded as Claude Code permission rules; allow is not.",
+    "toolPolicy 會鎖定每個工具的核准狀態。\"blocked\" 會從工作階段中移除該工具，並標記為管理員封鎖。\"ask\" 要求每次呼叫都核准（僅允許一次/拒絕；沒有持久的永遠允許）。\"allow\" 會預先核准。未列出的工具遵循使用者選擇：提示會提供持久的「永遠允許」；但對於可修改數據的工具，會改為顯示限於工作階段的「允許此任務」，並同時顯示帶惡意指令警告的「允許所有任務」。在 Code 分頁中，blocked / ask 會轉發為 Claude Code 權限規則；allow 不會。"
+  ],
+  [
+    "A UUID you generate. Tags telemetry so Anthropic support can locate your fleet's events. If unset, a shared placeholder UUID is sent and your events can't be distinguished from other unconfigured deployments. Not used for auth.",
+    "你產生的 UUID。用於標記診斷數據，方便 Anthropic 支援定位你裝置群的事件。未設定時會傳送共享占位 UUID，你的事件將無法與其他未設定的部署區分。不會用於驗證。"
+  ],
+  [
+    "Discard Changes",
+    "放棄變更"
+  ],
+  [
+    "Save Changes",
+    "儲存變更"
+  ],
+  [
+    "Apply Changes",
+    "套用變更"
+  ],
+  [
+    "Add folder",
+    "新增資料夾"
+  ],
+  [
+    "Read in docs",
+    "在文件中閱讀"
+  ],
+  [
+    "Auto-populate the model picker from /v1/models at launch;",
+    "啟動時从 /v1/models 自動填入模型選擇器；"
+  ],
+  [
+    "when this key isn't set in the config, discovery is skipped if the model list below makes it unnecessary.",
+    "如果設定中未設定此鍵，且下方的模型清單已使发现变得不必要，则会跳過探索。"
+  ],
+  [
+    "Applies to both the Cowork and Code tabs.",
+    "适用于 Cowork 和 Code 分頁。"
+  ],
+  [
+    "In the Cowork tab it governs the sandbox's web fetch, shell commands, and package installs.",
+    "在 Cowork 分頁中，它控制沙盒的網頁擷取、shell 命令和套件安裝。"
+  ],
+  [
+    "In the Code tab it is translated into Claude Code's network sandbox allowlist (claude.com); a separately deployed Claude Code managed-settings file on the endpoint takes precedence by default.",
+    "在 Code 分頁中，它会转换为 Claude Code 的網絡沙盒允許清單（claude.com）；預設情况下，端点上另行部署的 Claude Code 受管理設定檔優先。"
+  ],
+  [
+    "Accepts exact hostnames (",
+    "接受精确主機名稱（"
+  ],
+  [
+    "), wildcards (",
+    "）、萬用字元（"
+  ],
+  [
+    "matches one subdomain level), and",
+    "匹配一層子網域），以及"
+  ],
+  [
+    "to allow all.",
+    "用于允許全部。"
+  ],
+  [
+    "matches",
+    "匹配"
+  ],
+  [
+    "but not",
+    "但不匹配"
+  ],
+  [
+    "itself; add both if you need the apex.",
+    "本身；如果需要根網域，请两者都新增。"
+  ],
+  [
+    "IP literals and localhost always resolve regardless of this list; this is a public-egress filter, not a sandbox.",
+    "IP 字面值和 localhost 一律可解析，不受此列表影响；这是公開輸出過濾器，不是沙盒。"
+  ],
+  [
+    "Paths can reference",
+    "路径可以引用"
+  ],
+  [
+    "and these environment variables, expanded per user:",
+    "和这些環境變數，并按使用者展开："
+  ],
+  [
+    "The set is fixed; an entry that references any other",
+    "该集合是固定的；引用其他"
+  ],
+  [
+    "or one that is unset on the device, is ignored.",
+    "或裝置上未設定变量的項目会被忽略。"
+  ],
+  [
+    "When enabled, users can select",
+    "启用后，使用者可以選擇"
+  ],
+  [
+    "Auto mode (Code tab) / Act without asking (Cowork tab).",
+    "自動模式（Code 分頁）/ 無需詢問即可操作（Cowork 分頁）。"
+  ],
+  [
+    "Claude runs a safety classifier on each action and only prompts for approval on actions it judges risky, instead of following the static per-tool policy.",
+    "Claude 会对每个操作運作安全分類器，并且只在判断为有风险的操作上要求核准，而不是遵循静态的按工具政策。"
+  ],
+  [
+    "Requires a model that supports the classifier (Claude 4.6+).",
+    "需要支援该分类器的模型（Claude 4.6+）。"
+  ],
+  [
+    "Older models show the option greyed out.",
+    "較舊模型会将此选项顯示為灰色。"
+  ],
+  [
+    "and this key may both be set; Auto mode is a user-selectable option alongside the default policy, not a replacement for it.",
+    "和此键可以同时設定；自動模式是預設政策旁边的使用者可选项，而不是它的替代品。"
+  ],
+  [
+    "In the Code tab, a separately deployed Claude Code managed-settings file that sets",
+    "在 Code 分頁中，如果另行部署的 Claude Code 受管理設定檔将"
+  ],
+  [
+    "to \"disable\" overrides this key and keeps Auto mode hidden.",
+    "设为 \"disable\"，则会覆盖此键并保持隱藏自動模式。"
+  ],
+  [
+    "Disables Claude Code's bundled skills and workflows (deep-research and similar).",
+    "停用 Claude Code 內建的技能和工作流程（deep-research 及类似功能）。"
+  ],
+  [
+    "Use where they cannot function, for instance when WebFetch is egress-blocked and the gateway does not forward the WebSearch server tool.",
+    "适用于它们无法運作的情境，例如 WebFetch 被輸出阻擋且網關不轉發 WebSearch 服务器工具时。"
+  ],
+  [
+    "Allow Claude to run code in a local sandbox to analyze attached files it can't read natively",
+    "允许 Claude 在本機沙盒中運作代码，以分析它无法原生讀取的附件檔案"
+  ],
+  [
+    "like Excel and PowerPoint",
+    "例如 Excel 和 PowerPoint"
+  ],
+  [
+    "and perform inline data analysis.",
+    "并執行內嵌數據分析。"
+  ],
+  [
+    "The sandbox can only read files attached to the conversation and has no network access.",
+    "沙盒只能讀取附加到对话中的文件，且没有網絡存取权限。"
+  ],
+  [
+    "Off by default.",
+    "預設關閉。"
+  ],
+  [
+    "For OAuth-authenticated entries, the app builds the redirect URI as",
+    "对于通过 OAuth 驗證的項目，應用程式會将重新導向 URI 建構为"
+  ],
+  [
+    "register that exact value with the OAuth provider.",
+    "请在 OAuth 提供商处注册这个精确值。"
+  ],
+  [
+    "Tokens refresh automatically during a session, so users aren't interrupted when the initial access token expires.",
+    "權杖会在工作階段期间自动重新整理，因此初始存取權杖過期时不会打斷使用者。"
+  ],
+  [
+    "locks the per-tool approval state.",
+    "会鎖定每个工具的核准狀態。"
+  ],
+  [
+    "removes the tool from the session and labels it admin-blocked.",
+    "会从工作階段中移除该工具，并标记为管理員封鎖。"
+  ],
+  [
+    "requires approval on every call (Allow once / Deny only; no persistent always-allow).",
+    "要求每次呼叫都批准（仅允许一次/拒绝；没有持久的一律允许）。"
+  ],
+  [
+    "pre-approves.",
+    "会預先核准。"
+  ],
+  [
+    "Tools not listed follow the user's choice: the prompt offers a persistent Always allow, except for tools that can modify data, which instead show a session-scoped Allow for this task alongside Allow for all tasks with a malicious-instruction warning.",
+    "未列出的工具遵循使用者選擇：提示会提供持久的“一律允许”；但对于可修改數據的工具，会显示仅限工作階段的“允許此任務”，并同时显示带惡意指令警告的“允許所有任務”。"
+  ],
+  [
+    "In the Code tab,",
+    "在 Code 分頁中，"
+  ],
+  [
+    "are forwarded as Claude Code permission rules;",
+    "会轉發为 Claude Code 權限規則；"
+  ],
+  [
+    "is not.",
+    "不会。"
+  ],
+  [
+    "A UUID you generate.",
+    "你產生的 UUID。"
+  ],
+  [
+    "Tags telemetry so Anthropic support can locate your fleet's events.",
+    "用于标记診斷數據，方便 Anthropic 支援定位你裝置群的事件。"
+  ],
+  [
+    "If unset, a shared placeholder UUID is sent and your events can't be distinguished from other unconfigured deployments.",
+    "未設定时会傳送共享占位 UUID，你的事件将无法与其他未配置的部署區分。"
+  ],
+  [
+    "Not used for auth.",
+    "不會用於驗證。"
+  ],
+  [
+    "Use this for compliance notices, an internal-support link, or to identify the deployment. The banner is shown on every page after sign-in and cannot be dismissed by the user. Colors are six-digit hex ( #RRGGBB ); when linkUrl is set the banner text becomes an HTTPS link.",
+    "用于合規通知、內部支持連結，或用于識別部署。登入后，橫幅会显示在每个页面上，且用户无法關閉。顏色为六位十六进制（#RRGGBB）；設定 linkUrl 后，橫幅文字会變成 HTTPS 連結。"
+  ],
+  [
+    "Use this for compliance notices, an internal-support link, or to identify the deployment.",
+    "用于合規通知、內部支持連結，或用于識別部署。"
+  ],
+  [
+    "The banner is shown on every page after sign-in and cannot be dismissed by the user.",
+    "登入后，橫幅会显示在每个页面上，且用户无法關閉。"
+  ],
+  [
+    "Colors are six-digit hex (",
+    "顏色为六位十六进制（"
+  ],
+  [
+    "); when",
+    "）；当"
+  ],
+  [
+    "is set the banner text becomes an HTTPS link.",
+    "已設定时，橫幅文字会變成 HTTPS 連結。"
+  ],
+  [
+    "Only affects tool calls. Inference and MCP traffic are covered by their own allowlists elsewhere. When unset, only the inference endpoint is reachable from the sandbox; the agent's package installs (pip/npm) and web fetches will fail with a 403.",
+    "僅影響工具呼叫。推論和 MCP 流量由其他位置的各自允許清單控制。未設定时，沙盒只能連到推論端點；代理程式的套件安裝（pip/npm）和網頁擷取会因 403 失败。"
+  ],
+  [
+    "builtinToolPolicy and this key may both be set; Auto mode is a user-selectable option alongside the default policy, not a replacement for it.",
+    "builtinToolPolicy 和此键可以同时設定；自動模式是預設政策旁边的使用者可選項，而不是它的替代品。"
+  ],
+  [
+    "For OAuth-authenticated entries, the app builds the redirect URI as http://<callbackHost>: <callbackPort>/callback ; register that exact value with the OAuth provider. Tokens refresh automatically during a session, so users aren't interrupted when the initial access token expires.",
+    "对于通过 OAuth 驗證的項目，應用程式會将重新導向 URI 建構为 http://<callbackHost>:<callbackPort>/callback；请在 OAuth 提供者处注册这个精确值。權杖会在工作階段期间自动重新整理，因此初始連到權杖過期时不会打斷使用者。"
+  ],
+  [
+    "\"blocked\" removes the tool from the session and labels it admin-blocked.",
+    "\"blocked\" 会从工作階段中移除该工具，并标记为管理員封鎖。"
+  ],
+  [
+    "\"ask\" requires approval on every call (Allow once / Deny only; no persistent always-allow).",
+    "\"ask\" 要求每次呼叫都核准（僅允許一次/拒絕；没有持久的永遠允許）。"
+  ],
+  [
+    "\"allow\" pre-approves.",
+    "\"allow\" 会预先核准。"
   ]
 ]
