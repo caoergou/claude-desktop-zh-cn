@@ -88,7 +88,7 @@ powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.c
 irm https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/install-windows-curl.ps1 | iex
 ```
 
-> 命令行方式同样使用推荐配置：简体中文 + Cowork 兼容模式。
+> 命令行方式默认使用推荐配置（简体中文 + Cowork 兼容模式），这样复制粘贴就能用。如需选择其他语言或安装模式，请下载完整安装包。
 
 </details>
 
