@@ -1,8 +1,8 @@
 # Claude Desktop 中文补丁
 
-[![CI](https://github.com/javaht/claude-desktop-zh-cn/actions/workflows/ci.yml/badge.svg)](https://github.com/javaht/claude-desktop-zh-cn/actions/workflows/ci.yml)
-[![Latest Release](https://img.shields.io/github/v/release/javaht/claude-desktop-zh-cn)](https://github.com/javaht/claude-desktop-zh-cn/releases/latest)
-[![GitHub Downloads](https://img.shields.io/github/downloads/javaht/claude-desktop-zh-cn/total)](https://github.com/javaht/claude-desktop-zh-cn/releases)
+[![CI](https://github.com/caoergou/claude-desktop-zh-cn/actions/workflows/ci.yml/badge.svg)](https://github.com/caoergou/claude-desktop-zh-cn/actions/workflows/ci.yml)
+[![Latest Release](https://img.shields.io/github/v/release/caoergou/claude-desktop-zh-cn)](https://github.com/caoergou/claude-desktop-zh-cn/releases/latest)
+[![GitHub Downloads](https://img.shields.io/github/downloads/caoergou/claude-desktop-zh-cn/total)](https://github.com/caoergou/claude-desktop-zh-cn/releases)
 
 一个用于 Claude Desktop 的中文界面汉化补丁，支持简体中文、繁体中文（中国台湾）和繁体中文（中国香港）。
 
@@ -28,13 +28,21 @@ curl -fsSL https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/sc
 
 #### Windows
 
-**推荐：在 cmd 或“运行”对话框（Win + R）中执行：**
+**推荐方式：下载一键安装 bat（最稳）**
+
+1. 右键保存 [install-windows-curl.bat](https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/install-windows-curl.bat) 到桌面。
+2. 右键该文件，选择“以管理员身份运行”。
+3. 按窗口提示完成安装。
+
+> 这种方式不需要记忆命令，也不怕 PowerShell 执行策略拦截，和普通安装包体验一致。
+
+**备选：在 cmd 或“运行”对话框（Win + R）中执行：**
 
 ```cmd
 powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/install-windows-curl.ps1 | iex"
 ```
 
-> 这条命令通过 `-ExecutionPolicy Bypass` 临时绕过执行策略，不需要修改系统设置。
+> 这条命令通过 `-ExecutionPolicy Bypass` 临时绕过执行策略，不需要修改系统设置。如果安全软件拦截，请改用上面的 bat 方式或下载 Release zip。
 
 如果你已经在 PowerShell 窗口中，也可以直接运行：
 
@@ -171,7 +179,8 @@ cd claude-desktop-zh-cn
 - `scripts/install_windows.ps1`：Windows 汉化安装和卸载脚本。
 - `scripts/patch_claude_zh_cn.py`：真正执行补丁的 Python 脚本。
 - `scripts/install-mac-curl.sh`：macOS 一键下载安装脚本。
-- `scripts/install-windows-curl.ps1`：Windows 一键下载安装脚本。
+- `scripts/install-windows-curl.bat`：Windows 一键下载安装脚本（右键管理员运行）。
+- `scripts/install-windows-curl.ps1`：Windows 一键下载安装脚本核心（被 bat / cmd 命令调用）。
 - `resources/manifest.json` / `manifest-zh-TW.json` / `manifest-zh-HK.json`：语言包信息。
 - `resources/frontend-zh-CN.json` / `frontend-zh-TW.json` / `frontend-zh-HK.json`：Claude 前端界面中文翻译。
 - `resources/desktop-zh-CN.json` / `desktop-zh-TW.json` / `desktop-zh-HK.json`：Claude 桌面壳层中文翻译。
