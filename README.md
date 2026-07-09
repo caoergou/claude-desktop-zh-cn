@@ -76,19 +76,28 @@ curl -fsSL https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/sc
 
 #### Windows
 
-在 **cmd** 或 **Win + R** 中运行：
-
-```cmd
-powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/install-windows-curl.ps1 | iex"
-```
-
-或在已打开的 PowerShell 窗口中运行：
+在已打开的 PowerShell 窗口中运行：
 
 ```powershell
 irm https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/install-windows-curl.ps1 | iex
 ```
 
-> 命令行方式默认使用推荐配置（简体中文 + Cowork 兼容模式），这样复制粘贴就能用。如需选择其他语言或安装模式，请下载完整安装包。
+或在 **cmd** / **Win + R** 中运行：
+
+```cmd
+powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/install-windows-curl.ps1 | iex"
+```
+
+#### 想换语言或模式？
+
+命令行一键命令默认使用**简体中文 + Cowork 兼容模式**，这样复制粘贴就能用。
+
+如果你需要其他语言或模式，建议下载完整安装包，解压后运行：
+
+- macOS：双击 `install-mac.command`
+- Windows：右键 `install-windows.bat` → 以管理员身份运行
+
+然后按 `1/2/3` 选择语言和模式即可。
 
 </details>
 
