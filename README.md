@@ -28,13 +28,21 @@ curl -fsSL https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/sc
 
 #### Windows
 
-在 PowerShell 中运行：
+**推荐：在 cmd 或“运行”对话框（Win + R）中执行：**
+
+```cmd
+powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/install-windows-curl.ps1 | iex"
+```
+
+> 这条命令通过 `-ExecutionPolicy Bypass` 临时绕过执行策略，不需要修改系统设置。
+
+如果你已经在 PowerShell 窗口中，也可以直接运行：
 
 ```powershell
 irm https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/install-windows-curl.ps1 | iex
 ```
 
-> 如果 Windows 提示“执行策略”限制，可先运行 `Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process`，再执行上面的命令。
+> 如果提示“执行策略”限制，可先运行 `Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process`。
 
 ### 方式二：下载 Release 包
 

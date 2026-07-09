@@ -114,8 +114,9 @@ jobs:
             ```
 
             ### Windows
-            ```powershell
-            irm https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/install-windows-curl.ps1 | iex
+            在 cmd 或“运行”对话框（Win + R）中执行：
+            ```cmd
+            powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/install-windows-curl.ps1 | iex"
             ```
 
             ## 手动下载
