@@ -35,7 +35,7 @@ from typing import Any
 
 APP_DEFAULT = Path("/Applications/Claude.app")
 ROOT = Path(__file__).resolve().parent.parent
-RESOURCES = ROOT / "resources"
+RESOURCES = Path(os.environ.get("CLAUDE_ZH_RESOURCES_DIR", ROOT / "resources"))
 BACKUP_GLOB = "Claude.backup-before-zh-CN-*.app"
 
 APP_ASAR_REL = Path("Contents/Resources/app.asar")

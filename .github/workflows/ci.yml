@@ -1,0 +1,75 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test-python:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Run pytest
+        run: python -m pytest tests/ -v
+
+      - name: Check Python syntax
+        run: python3 -m py_compile scripts/patch_claude_zh_cn.py
+
+      - name: Check Bash syntax
+        run: bash -n install-mac.command
+
+      - name: Validate JSON resources
+        run: |
+          shopt -s nullglob
+          failed=0
+          for f in resources/*.json; do
+            if ! python3 -m json.tool "$f" > /dev/null; then
+              echo "Invalid JSON: $f"
+              failed=1
+            fi
+          done
+          exit "$failed"
+        shell: bash
+
+  test-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check PowerShell syntax
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $content = Get-Content scripts/install_windows.ps1 -Raw
+          $errors = $null
+          $null = [System.Management.Automation.PSParser]::Tokenize($content, [ref]$errors)
+          if ($errors.Count -gt 0) {
+            Write-Host "PowerShell parse errors found:"
+            $errors | ForEach-Object { Write-Host $_.Message }
+            exit 1
+          }
+          Write-Host "PowerShell syntax OK"
+
+      - name: Check Windows batch syntax
+        shell: cmd
+        run: |
+          cd /d "%GITHUB_WORKSPACE%"
+          cmd /c "install-windows.bat /?" >nul 2>&1 || (
+            echo Batch file parsed successfully
+          )
