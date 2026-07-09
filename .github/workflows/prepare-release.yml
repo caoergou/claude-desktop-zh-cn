@@ -104,6 +104,8 @@ jobs:
         run: |
           cp scripts/install-mac-curl.sh dist/install-mac-curl.sh
           cp scripts/install-windows-curl.bat dist/install-windows-curl.bat
+          cp install-mac-simple.command dist/install-mac-simple.command
+          cp install-windows-simple.bat dist/install-windows-simple.bat
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -127,9 +129,13 @@ jobs:
             powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/install-windows-curl.ps1 | iex"
             ```
 
-            ## 手动下载（最直观）
-            - `install-mac-curl.sh`：macOS 一键安装脚本
-            - `install-windows-curl.bat`：Windows 一键安装脚本（右键管理员运行）
+            ## 推荐：傻瓜版（最简单）
+            - `install-mac-simple.command`：macOS 双击运行，自动安装简体中文 + Cowork 兼容模式
+            - `install-windows-simple.bat`：Windows 右键管理员运行，自动安装简体中文 + Cowork 兼容模式
+
+            ## 一键脚本
+            - `install-mac-curl.sh`：macOS 命令行一键安装脚本
+            - `install-windows-curl.bat`：Windows 命令行一键安装脚本
 
             ## 完整安装包
             - `claude-desktop-zh-cn-mac.zip`：下载后双击 `install-mac.command`
@@ -142,4 +148,6 @@ jobs:
             dist/claude-desktop-zh-cn-windows.zip
             dist/install-mac-curl.sh
             dist/install-windows-curl.bat
+            dist/install-mac-simple.command
+            dist/install-windows-simple.bat
           fail_on_unmatched_files: true

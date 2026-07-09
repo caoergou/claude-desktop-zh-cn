@@ -4,34 +4,57 @@
 [![Latest Release](https://img.shields.io/github/v/release/caoergou/claude-desktop-zh-cn)](https://github.com/caoergou/claude-desktop-zh-cn/releases/latest)
 [![GitHub Downloads](https://img.shields.io/github/downloads/caoergou/claude-desktop-zh-cn/total)](https://github.com/caoergou/claude-desktop-zh-cn/releases)
 
-一个用于 Claude Desktop 的中文界面汉化补丁，支持简体中文、繁体中文（中国台湾）和繁体中文（中国香港）。
+> 为 Claude Desktop 提供简体中文、繁体中文（中国台湾）、繁体中文（中国香港）界面汉化。
+> 支持 API 与官方订阅；第三方 API 配置请参见 https://linux.do/topic/2032192。
 
-本汉化方案支持使用 API 和官方订阅的方式。第三方 API 请先参照 https://linux.do/topic/2032192 配置。
+<img src="docs/images/claude-desktop-zh-cn-home.png" alt="Claude Desktop 中文界面截图" width="640">
 
-**遇到问题请及时反馈，欢迎扫码加入 claude desktop 交流群。**
+---
 
-<img src="docs/images/wechat-group.png" alt="claude desktop 交流群二维码" width="360">
+## 目录
 
-## 界面截图
+- [快速安装](#快速安装)
+- [功能特点](#功能特点)
+- [适用环境](#适用环境)
+- [使用方式](#使用方式)
+- [安装模式说明](#安装模式说明)
+- [卸载 / 恢复](#卸载--恢复)
+- [常见问题](#常见问题)
+- [文件说明](#文件说明)
+- [Star History](#star-history)
+- [免责声明](#免责声明)
 
-![Claude Desktop 中文界面截图](docs/images/claude-desktop-zh-cn-home.png) ![Claude Desktop 中文设置界面截图](docs/images/claude-desktop-zh-cn-settings.png)
+---
 
 ## 快速安装
 
-### 方式一：一键命令（推荐）
+### 推荐方式：傻瓜版（最简单）
+
+| 系统 | 下载文件 | 运行方式 |
+| :--- | :--- | :--- |
+| **macOS** | `install-mac-simple.command` | 双击运行 |
+| **Windows** | `install-windows-simple.bat` | 右键 → **以管理员身份运行** |
+
+👉 下载地址：[Latest Release](https://github.com/caoergou/claude-desktop-zh-cn/releases/latest)
+
+> 傻瓜版会自动安装：**简体中文 + Cowork 兼容模式**，全程不需要选择。
+> 这是最安全的模式，不会破坏 Windows 签名，适合绝大多数用户。
+
+### 我需要其他语言或模式怎么办？
+
+下载完整安装包，解压后运行：
+
+- macOS：双击 `install-mac.command`
+- Windows：右键 `install-windows.bat` → 以管理员身份运行
+
+然后按提示选择语言（简体中文 / 繁体中文台湾 / 繁体中文香港）和安装模式。
+
+### 命令行用户
+
+<details>
+<summary>点击展开命令行方式</summary>
 
 #### macOS
-
-**推荐方式：下载一键安装脚本**
-
-1. 到 [Latest Release](https://github.com/caoergou/claude-desktop-zh-cn/releases/latest) 下载 `install-mac-curl.sh`。
-2. 在终端中运行：
-
-```bash
-bash ~/Downloads/install-mac-curl.sh
-```
-
-**或直接在终端中执行：**
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/install-mac-curl.sh | bash
@@ -39,205 +62,221 @@ curl -fsSL https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/sc
 
 #### Windows
 
-**推荐方式：下载一键安装 bat（最稳）**
-
-1. 到 [Latest Release](https://github.com/caoergou/claude-desktop-zh-cn/releases/latest) 下载 `install-windows-curl.bat` 到桌面。
-2. 右键该文件，选择“以管理员身份运行”。
-3. 按窗口提示完成安装。
-
-> 这种方式不需要记忆命令，也不怕 PowerShell 执行策略拦截，和普通安装包体验一致。
-
-**备选：在 cmd 或“运行”对话框（Win + R）中执行：**
+在 **cmd** 或 **Win + R** 中运行：
 
 ```cmd
 powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/install-windows-curl.ps1 | iex"
 ```
 
-> 这条命令通过 `-ExecutionPolicy Bypass` 临时绕过执行策略，不需要修改系统设置。如果安全软件拦截，请改用上面的 bat 方式或下载 Release zip。
-
-如果你已经在 PowerShell 窗口中，也可以直接运行：
+或在已打开的 PowerShell 窗口中运行：
 
 ```powershell
 irm https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/install-windows-curl.ps1 | iex
 ```
 
-> 如果提示“执行策略”限制，可先运行 `Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process`。
+> 如果提示执行策略限制，可先运行 `Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process`。
 
-### 方式二：下载 Release 包
+</details>
 
-1. 访问 [Latest Release](https://github.com/javaht/claude-desktop-zh-cn/releases/latest)。
-2. 下载对应系统的 zip：
-   - macOS：`claude-desktop-zh-cn-mac.zip`
-   - Windows：`claude-desktop-zh-cn-windows.zip`
-3. 解压后运行入口脚本：
-   - macOS：双击 `install-mac.command`
-   - Windows：右键 `install-windows.bat`，选择“以管理员身份运行”
-
-### 方式三：克隆仓库
-
-```bash
-git clone https://github.com/javaht/claude-desktop-zh-cn.git
-cd claude-desktop-zh-cn
-```
-
-然后按下方[使用方式](#使用方式)运行对应脚本。
+---
 
 ## 功能特点
 
-- 一键安装 Claude Desktop 中文界面资源，支持 macOS 和 Windows。
-- 支持三种中文变体：`zh-CN`（简体中文）、`zh-TW`（繁体中文（中国台湾））、`zh-HK`（繁体中文（中国香港））。
-- 自动给 Claude 前端语言白名单加入当前选择的中文变体。
-- 会修改 `app.asar` 的安装模式可对在线账号登录后的 `claude.ai` 页面做显示层 DOM 翻译；该逻辑只改界面文本和语言状态，不改第三方 API、网关、模型路由或请求内容。
-- macOS 自动合并当前 Claude 版本的英文语言文件与随包中文翻译。
-- 新版本新增但暂未翻译的字段会保留英文，避免界面缺失文本。
-- macOS 可绕过新版 Claude Desktop 对 3P gateway 模型名的本地 Anthropic 校验，避免 `deepseek-v4-pro` / `kimi-*` 等模型名导致配置整体失效。
-- Windows 安装脚本会直接备份并修改当前 Claude Desktop 的资源文件；卸载时从备份恢复。注意：修改 `app.asar` 后需要同步改写 `Claude.exe` 内嵌完整性哈希，这会破坏 Authenticode 签名；Cowork 沙箱/截图工作区需要签名验证，建议需要 Cowork 时选择 Windows 模式 1，并在网关或 ccswitch 中做模型别名映射。
-- macOS 安装前自动备份原始 `/Applications/Claude.app`。
-- 自动写入 Claude 用户配置，将语言设置为所选中文变体。
+- ✅ 支持三种中文变体：`zh-CN`（简体中文）、`zh-TW`（繁体中文（中国台湾））、`zh-HK`（繁体中文（中国香港））。
+- ✅ 自动将所选中文加入 Claude 前端语言白名单。
+- ✅ macOS 自动合并当前 Claude 版本的 `en-US.json` 与随包中文翻译，新增未翻译字段保留英文，避免缺字。
+- ✅ 提供 **Cowork 兼容模式**，不修改 `app.asar`，不破坏 Windows 签名，适合需要使用 Cowork 沙箱 / 截图工作区的用户。
+- ✅ 提供 **官方账号登录模式**，注入在线 `claude.ai` 页面 DOM 翻译，聊天、项目、Artifacts 等页面显示中文。
+- ✅ macOS 可绕过新版 Claude Desktop 对 3P gateway 模型名的本地 Anthropic 校验。
+- ✅ 安装前自动备份原始文件，卸载时可一键恢复。
+- ✅ 自动写入 Claude 用户配置，将语言设置为所选中文变体。
+- ✅ 支持同步 / 取消同步 CC Switch skills。
+- ✅ 支持一键禁止 / 允许 Claude Desktop 自动更新。
+
+---
 
 ## 适用环境
 
-- macOS 或 Windows
-- 已安装 Claude Desktop
-- macOS 需要系统自带 Python 3（通常路径为 `/usr/bin/python3`）
-- Windows 需要 PowerShell，并建议以管理员权限运行
+| 项目 | 要求 |
+| :--- | :--- |
+| 操作系统 | macOS 或 Windows |
+| 前置软件 | 已安装 Claude Desktop |
+| macOS 依赖 | 系统自带 Python 3（通常为 `/usr/bin/python3`） |
+| Windows 依赖 | PowerShell，建议以管理员权限运行 |
+
+---
 
 ## 使用方式
 
-### macOS
+### 安装前必读
 
-1. 退出 Claude Desktop。
-2. 通过[快速安装](#快速安装)任一种方式获取脚本。
-3. 双击 `install-mac.command`，选择安装中文补丁、安全模式安装或恢复原样 / 卸载补丁。
-4. 选择安装中文补丁时，脚本会先尝试恢复旧备份来清理已有汉化；如果没有旧备份，会提示跳过并继续。
-5. 安装时选择要安装的语言（1=简体中文，2=繁体中文（中国台湾），3=繁体中文（中国香港））。安全模式同样支持三种中文，并跳过结构性 `app.asar` 补丁；仅保留等长菜单汉化补丁。
-6. 按提示输入 Mac 登录密码。
-7. Claude 会自动重新打开。
-8. 如果没有自动切换，打开左下角账号菜单，选择 `Language` -> 对应的中文选项。
+1. **完全退出 Claude Desktop**（包括菜单栏 / 托盘图标）。
+2. 如需 Cowork / 截图工作区，请使用 **傻瓜版** 或 **Cowork 兼容模式**。
 
-如果需要调整自动更新，可再次运行 `install-mac.command`，选择 `4`，再输入 `y` 禁止自动更新，或输入 `n` 允许自动更新。
+### 傻瓜版（推荐）
 
-如果需要把 CC Switch skills 同步到 Claude Desktop，可再次运行 `install-mac.command`，选择 `5`，再输入 `y` 同步，或输入 `n` 删除之前的同步。脚本会扫描 `~/.cc-switch/skills` 下所有包含 `SKILL.md` 的 skill；同步时只把 Claude Desktop 中尚不存在的 skill 以软链接加入本地 skills 目录并更新 Claude Desktop 的 skills manifest，同名 skill 会跳过；删除同步时只清理指向 `~/.cc-switch/skills` 的软链接和对应 manifest 记录，不删除 CC Switch 源目录，也不覆盖或删除 Desktop 里已有版本。同步或删除后重启 Claude Desktop 生效。
+#### macOS
 
-### Windows
+1. 到 [Latest Release](https://github.com/caoergou/claude-desktop-zh-cn/releases/latest) 下载 `install-mac-simple.command`。
+2. 双击运行。
+3. 按提示输入 Mac 登录密码，等待完成。
+4. Claude 会自动重启并切换到简体中文。
 
-1. 退出 Claude Desktop。
-2. 通过[快速安装](#快速安装)任一种方式获取脚本。
-3. 右键 `install-windows.bat`，选择以管理员身份运行。
-4. 先选择安装模式：
-   - `1` 安装中文补丁（Cowork 兼容模式，跳过 `app.asar` 补丁；第三方模型请用网关或 ccswitch 别名映射）
-   - `2` 安装中文补丁（官方账号登录模式：Cowork 沙箱/工作区不可用）
+#### Windows
+
+1. 到 [Latest Release](https://github.com/caoergou/claude-desktop-zh-cn/releases/latest) 下载 `install-windows-simple.bat`。
+2. 右键该文件 → **以管理员身份运行**。
+3. 等待窗口提示完成。
+4. Claude 会自动重启并切换到简体中文。
+
+### 高级版（需要选择语言或模式）
+
+<details>
+<summary>点击展开高级版使用说明</summary>
+
+#### macOS
+
+1. 下载完整安装包 `claude-desktop-zh-cn-mac.zip` 并解压。
+2. 双击 `install-mac.command`。
+3. 按菜单选择操作：
+   - `1` 安装中文补丁（官方账号登录模式）
+   - `2` 安装中文补丁（Cowork 兼容模式）
    - `3` 恢复原样 / 卸载补丁
-   - `4` 自动更新设置（`y` 禁止自动更新，`n` 允许自动更新）
-   - `5` 同步 CC Switch skills（`y` 开启同步，`n` 删除同步）
-5. 选择安装中文补丁时，脚本会先尝试从旧备份恢复来清理已有汉化；如果没有旧备份，会提示跳过并继续。
-6. 安装时再选择语言：
-   - `1` 简体中文
-   - `2` 繁体中文（中国台湾）
-   - `3` 繁体中文（中国香港）
-7. 脚本会备份当前 Claude Desktop 资源，写入本仓库 `resources` 目录里的中文 JSON，补齐硬编码界面文本，并重启 Claude Desktop。选择模式 1 时会跳过 `app.asar` 补丁，更适合需要 Cowork/截图工作区的场景。选择模式 2 时会直接修改当前 Claude 的 `app.asar`，卸载时从备份恢复。
-8. 如果没有自动切换，打开左下角账号菜单，选择 `Language` -> 对应的中文选项。
+   - `4` 禁止 / 允许自动更新
+   - `5` 同步 / 取消同步 CC Switch skills
+4. 选择语言：`1` 简体中文、`2` 繁体中文（中国台湾）、`3` 繁体中文（中国香港）。
+5. 按提示输入 Mac 登录密码。
+6. Claude 会自动重启；如未自动切换语言，点击左下角账号菜单 → `Language` → 选择对应中文。
 
-## 两种安装模式说明
+#### Windows
 
-### Cowork 兼容模式（macOS 选项 2 / Windows 模式 1）
+1. 下载完整安装包 `claude-desktop-zh-cn-windows.zip` 并解压。
+2. 右键 `install-windows.bat` → **以管理员身份运行**。
+3. 按菜单选择操作：
+   - `1` 安装中文补丁（Cowork 兼容模式）
+   - `2` 安装中文补丁（官方账号登录模式）
+   - `3` 恢复原样 / 卸载补丁
+   - `4` 禁止 / 允许自动更新
+   - `5` 同步 / 取消同步 CC Switch skills
+4. 选择语言：`1` 简体中文、`2` 繁体中文（中国台湾）、`3` 繁体中文（中国香港）。
+5. 脚本会备份资源、写入中文 JSON、汉化硬编码文本并重启 Claude Desktop。
+6. 如未自动切换语言，点击左下角账号菜单 → `Language` → 选择对应中文。
 
-- 不修改 `app.asar`，因此不会破坏 `Claude.exe` 的 Authenticode 签名。
+</details>
+
+---
+
+## 安装模式说明
+
+### Cowork 兼容模式
+
+- **macOS 选项 `2` / Windows 模式 `1`**
+- 不修改 `app.asar`，因此不会破坏 Windows 下 `Claude.exe` 的 Authenticode 签名。
 - 适合需要使用 **Cowork 沙箱 / 截图工作区** 的用户。
-- 第三方模型名（如 `deepseek-v4-pro`、`kimi-*`）不会触发本地 Anthropic 校验失败，因为相关校验位于被跳过的 `app.asar` 补丁路径。
+- 第三方模型名（如 `deepseek-v4-pro`、`kimi-*`）不会触发本地 Anthropic 校验失败。
+- 如需使用第三方模型，请在网关或 ccswitch 中做模型别名映射。
 
-### 官方账号登录模式（macOS 选项 1 / Windows 模式 2）
+### 官方账号登录模式
 
-- 会修改 `app.asar`，注入在线 `claude.ai` 页面的 DOM 翻译。
+- **macOS 选项 `1` / Windows 模式 `2`**
+- 会修改 `app.asar`，向在线 `claude.ai` 页面注入 DOM 翻译。
 - 聊天、项目、Artifacts 等远程页面会显示中文。
 - Windows 下会改写 `Claude.exe` 内嵌的 asar 完整性哈希，导致 Authenticode 签名 `HashMismatch`；Cowork VM 服务可能拒绝客户端并报 `RPC pipe closed`。
 
+---
+
 ## 卸载 / 恢复
 
-执行脚本，选择恢复即可：
+重新运行安装脚本，选择恢复即可：
 
-- macOS：再次运行 `install-mac.command`，选择 `3`。
-- Windows：再次运行 `install-windows.bat`，选择 `3`。
+- macOS：选择 `3`
+- Windows：选择 `3`
+
+---
 
 ## 常见问题
 
-### macOS 双击 `install-mac.command` 提示“无法打开”
+### macOS 双击脚本提示“无法打开”
 
-右键 `install-mac.command` → 选择“打开”，在弹出的安全提示中点击“仍要打开”。
+右键脚本 → 选择“打开” → 在弹出的安全提示中点击“仍要打开”。
 
-### Windows 运行 `install-windows.bat` 被安全软件拦截
+### Windows 脚本被安全软件拦截
 
-本脚本需要管理员权限修改 Claude Desktop 安装目录，Windows Defender 或第三方安全软件可能会误报。请临时关闭实时保护，或将脚本加入白名单。
+本脚本需要管理员权限修改 Claude Desktop 安装目录，Windows Defender 或第三方安全软件可能误报。请临时关闭实时保护，或将脚本加入白名单。
 
 ### 安装后 Claude Desktop 没有变成中文
 
-1. 确保已完全退出 Claude Desktop（包括菜单栏图标）。
-2. 打开左下角账号菜单 → `Language` → 选择对应的中文变体。
-3. 如果仍不生效，可能是 Claude 版本更新导致资源结构变化，请等待本项目更新或重新运行安装脚本。
+1. 确认已完全退出 Claude Desktop（包括菜单栏 / 托盘图标）。
+2. 打开左下角账号菜单 → `Language` → 选择对应中文变体。
+3. 若仍不生效，可能是 Claude 版本更新导致资源结构变化，请等待本项目更新或重新运行安装脚本。
 
 ### Cowork / 截图工作区报错
 
-请使用 Cowork 兼容模式安装（macOS 选项 2 / Windows 模式 1），并在第三方网关或 ccswitch 中做模型别名映射。
+请使用 **Cowork 兼容模式**安装，并在第三方网关或 ccswitch 中做模型别名映射。
 
 ### 一键命令下载慢或失败
 
-可以直接从 [Releases](https://github.com/javaht/claude-desktop-zh-cn/releases) 页面下载 zip 包，解压后手动运行入口脚本。
+直接到 [Releases](https://github.com/caoergou/claude-desktop-zh-cn/releases) 页面下载 zip 或一键脚本到本地运行。
+
+---
 
 ## 文件说明
 
-- `install-mac.command`：macOS 双击运行入口。
-- `install-windows.bat`：Windows 安装 / 恢复菜单入口。
-- `scripts/install_windows.ps1`：Windows 汉化安装和卸载脚本。
-- `scripts/patch_claude_zh_cn.py`：真正执行补丁的 Python 脚本。
-- `scripts/install-mac-curl.sh`：macOS 一键下载安装脚本。
-- `scripts/install-windows-curl.bat`：Windows 一键下载安装脚本（右键管理员运行）。
-- `scripts/install-windows-curl.ps1`：Windows 一键下载安装脚本核心（被 bat / cmd 命令调用）。
-- `resources/manifest.json` / `manifest-zh-TW.json` / `manifest-zh-HK.json`：语言包信息。
-- `resources/frontend-zh-CN.json` / `frontend-zh-TW.json` / `frontend-zh-HK.json`：Claude 前端界面中文翻译。
-- `resources/desktop-zh-CN.json` / `desktop-zh-TW.json` / `desktop-zh-HK.json`：Claude 桌面壳层中文翻译。
-- `resources/Localizable.strings` / `Localizable-zh-TW.strings` / `Localizable-zh-HK.strings`：macOS 原生菜单中文资源。
-- `resources/statsig-zh-CN.json` / `statsig-zh-TW.json` / `statsig-zh-HK.json`：statsig i18n 兜底资源。
+| 文件 | 说明 |
+| :--- | :--- |
+| `install-mac-simple.command` | macOS 傻瓜版入口：双击自动安装 |
+| `install-windows-simple.bat` | Windows 傻瓜版入口：右键管理员运行自动安装 |
+| `install-mac.command` | macOS 高级版入口（可选择语言 / 模式） |
+| `install-windows.bat` | Windows 高级版入口（可选择语言 / 模式） |
+| `scripts/install-mac-curl.sh` | macOS 命令行一键安装脚本 |
+| `scripts/install-windows-curl.bat` | Windows 命令行一键安装脚本 |
+| `scripts/install-windows-curl.ps1` | Windows 一键脚本核心 |
+| `scripts/patch_claude_zh_cn.py` | macOS 实际补丁逻辑 |
+| `scripts/install_windows.ps1` | Windows 实际补丁逻辑 |
+| `resources/frontend-zh-*.json` | 前端界面中文翻译 |
+| `resources/desktop-zh-*.json` | 桌面壳层中文翻译 |
+| `resources/Localizable*.strings` | macOS 原生菜单中文资源 |
+| `resources/statsig-zh-*.json` | statsig i18n 兜底资源 |
+| `resources/manifest*.json` | 语言包信息 |
 
-## macOS 脚本会做什么
+<details>
+<summary>macOS 脚本详细行为</summary>
 
-- 安装时备份当前 `/Applications/Claude.app` 到同目录，名字类似：
-  `Claude.backup-before-zh-CN-20260424-120000.app`
-- 安装前会先尝试恢复已有旧备份，清理上一轮汉化；没有旧备份时跳过并继续安装。
+- 安装时备份 `/Applications/Claude.app` 到同目录，命名形如 `Claude.backup-before-zh-CN-20260424-120000.app`。
+- 安装前先尝试恢复旧备份以清理已有汉化；无旧备份时跳过并继续。
 - 恢复 / 卸载时选择同目录下最早的 `Claude.backup-before-zh-CN-*.app` 恢复为 `/Applications/Claude.app`，并删除其他备份。
 - 复制 Claude.app 到临时目录并打补丁。
 - 给前端语言白名单加入当前选择的中文变体。
-- 对 `Contents/Resources/app.asar` 做等长补丁，关闭 3P gateway 启动阶段的 `inferenceModels` Anthropic 名称校验；安全模式会跳过这一步。
-- 安全模式仍会对主进程菜单中的硬编码英文做等长汉化补丁，覆盖开发者菜单等少量不走资源文件的菜单项。
-- 普通安装模式会在在线账号登录 / 聊天页面注入显示层 DOM 翻译，覆盖聊天、项目、Artifacts 等远程页面；安全模式会跳过此项，因为它需要修改 `app.asar`。
-- 合并当前 Claude 版本的 `en-US.json` 和随包中文翻译：
-  当前版本已有中文翻译的 key 会变中文，新版本新增但本包没有的 key 会保留英文，避免应用缺字段。
-- 写入 `~/Library/Application Support/Claude/config.json`，设置 `"locale"` 为所选语言代码（`zh-CN`、`zh-TW` 或 `zh-HK`），并在 `claude.ai` 页面加载前同步其前端语言状态。
-- 对修改后的 Claude.app 及其内部 app/framework/原生二进制做一致的本机 ad-hoc 重签名，并清除 `com.apple.quarantine` 隔离属性。
+- 对 `Contents/Resources/app.asar` 做等长补丁，关闭 3P gateway 启动阶段的 Anthropic 名称校验；安全模式会跳过。
+- 合并当前 Claude 版本的 `en-US.json` 与随包中文翻译。
+- 写入 `~/Library/Application Support/Claude/config.json`，设置 `locale` 为所选语言。
+- 对修改后的 Claude.app 做本机 ad-hoc 重签名，并清除 `com.apple.quarantine` 隔离属性。
 - 重新启动 Claude。
-- 可选菜单项 `4` 用 `y/n` 控制 Claude Desktop 自动更新：`y` 禁止自动更新，`n` 允许自动更新。若当前存在有效的 Claude-3p `configLibrary`，脚本会写入当前 applied 配置；否则写入 Claude Desktop enterprise policy。
-- 可选菜单项 `5` 用 `y/n` 控制 CC Switch skills 同步：`y` 会把 `~/.cc-switch/skills` 中缺失的 skill 软链接到 Claude Desktop 的本地 skills 目录，并更新对应 `manifest.json`；`n` 只删除之前同步产生的 CC Switch 软链接和对应 manifest 记录。该操作不需要管理员权限，不会覆盖同名 skill。
 
-## Windows 脚本会做什么
+</details>
+
+<details>
+<summary>Windows 脚本详细行为</summary>
 
 - 查找 Windows 版 Claude Desktop 安装目录。
-- 安装前会先尝试从 `resources\.zh-cn-backups` 恢复旧备份，清理上一轮汉化；没有旧备份时跳过并继续安装。
-- 修改前备份将被改动的前端 JS bundle、`app.asar` 和 `Claude.exe` 到 `resources\.zh-cn-backups`。
-- 复制本仓库现有中文资源，不使用其他语言包项目里的 JSON：
-  - `resources/frontend-zh-CN.json` / `frontend-zh-TW.json` / `frontend-zh-HK.json` -> `ion-dist\i18n\` 对应语言代码 `.json`
-  - `resources/desktop-zh-CN.json` / `desktop-zh-TW.json` / `desktop-zh-HK.json` -> `resources\` 对应语言代码 `.json`
-  - `resources/statsig-zh-CN.json` / `statsig-zh-TW.json` / `statsig-zh-HK.json` -> `ion-dist\i18n\statsig\` 对应语言代码 `.json`
+- 安装前从 `resources\.zh-cn-backups` 恢复旧备份以清理已有汉化。
+- 备份被改动的前端 JS bundle、`app.asar` 和 `Claude.exe`。
+- 写入随包中文资源到 `ion-dist\i18n\`、`resources\`、`ion-dist\i18n\statsig\`。
 - 给前端语言白名单加入当前选择的中文变体。
-- 汉化前端 bundle 中未走 i18n JSON 的硬编码界面文本，例如侧边栏入口、配置页标签和模型选择项。
-- 官方账号登录模式会在在线账号登录 / 聊天页面注入显示层 DOM 翻译，覆盖聊天、项目、Artifacts 等远程页面；Cowork 兼容模式会跳过此项，因为它需要修改 `app.asar`。
-- Windows 的模式 2 会直接改写当前 Claude 的 `app.asar` 并同步改写 `Claude.exe` 内嵌完整性哈希，导致 Authenticode 签名 `HashMismatch`；Cowork VM 服务可能拒绝客户端并报 `RPC pipe closed`。如果需要 Cowork 沙箱/截图工作区，请使用模式 1，并通过网关/ccswitch 模型别名映射解决第三方模型名校验。
-- 写入 Windows 用户配置，将语言设置为所选语言代码（`zh-CN`、`zh-TW` 或 `zh-HK`）。
-- 可选菜单项 `4` 用 `y/n` 控制 Claude Desktop 自动更新：`y` 禁止自动更新，`n` 允许自动更新。若当前存在有效的 Claude-3p `configLibrary`，脚本会写入当前 applied 配置；否则写入 `HKCU\SOFTWARE\Policies\Claude` policy。
-- 可选菜单项 `5` 用 `y/n` 控制 CC Switch skills 同步：`y` 会把 `%USERPROFILE%\.cc-switch\skills` 中缺失的 skill 以软链接加入 Claude Desktop 的本地 skills 目录，并把 `SKILL.md` frontmatter 里的 `name` 和 `description` 写入对应 `manifest.json`；`n` 只删除之前同步产生、且指向 CC Switch skills 目录内的软链接和对应 manifest 记录。脚本会从当前用户的 AppData 动态扫描 Claude-3p skills plugin，不写死 session UUID，不覆盖同名 skill，也不删除 CC Switch 源目录。
+- 汉化前端 bundle 中未走 i18n JSON 的硬编码界面文本。
+- 官方账号登录模式会注入在线 `claude.ai` 页面 DOM 翻译。
+- 写入 Windows 用户配置，将语言设置为所选语言代码。
 - 重启 Claude Desktop。
+
+</details>
+
+---
 
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=javaht/claude-desktop-zh-cn&type=Date)](https://www.star-history.com/#javaht/claude-desktop-zh-cn&Date)
+
+---
 
 ## 免责声明
 

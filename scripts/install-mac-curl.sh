@@ -33,4 +33,9 @@ if [ ! -x install-mac.command ]; then
   chmod +x install-mac.command
 fi
 
+# 默认使用傻瓜配置：简体中文 + Cowork 兼容模式
+export CLAUDE_ACTION=install
+export CLAUDE_LANG=zh-CN
+export CLAUDE_SKIP_ASAR_PATCH=1
+
 exec ./install-mac.command "$@"
