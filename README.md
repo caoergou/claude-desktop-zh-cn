@@ -22,6 +22,17 @@
 
 #### macOS
 
+**推荐方式：下载一键安装脚本**
+
+1. 到 [Latest Release](https://github.com/caoergou/claude-desktop-zh-cn/releases/latest) 下载 `install-mac-curl.sh`。
+2. 在终端中运行：
+
+```bash
+bash ~/Downloads/install-mac-curl.sh
+```
+
+**或直接在终端中执行：**
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/install-mac-curl.sh | bash
 ```
@@ -30,7 +41,7 @@ curl -fsSL https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/sc
 
 **推荐方式：下载一键安装 bat（最稳）**
 
-1. 右键保存 [install-windows-curl.bat](https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/install-windows-curl.bat) 到桌面。
+1. 到 [Latest Release](https://github.com/caoergou/claude-desktop-zh-cn/releases/latest) 下载 `install-windows-curl.bat` 到桌面。
 2. 右键该文件，选择“以管理员身份运行”。
 3. 按窗口提示完成安装。
 
