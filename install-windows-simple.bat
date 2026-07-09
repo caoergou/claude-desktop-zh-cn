@@ -3,11 +3,11 @@ setlocal EnableExtensions
 chcp 65001 >nul 2>&1
 
 echo ==========================================
-echo   Claude Desktop 中文补丁 - Windows 傻瓜版
+echo   Claude Desktop 中文补丁 - Windows 简易版
 echo ==========================================
 echo.
 echo 本脚本会自动安装：简体中文 + Cowork 兼容模式
-echo 请确保已退出 Claude Desktop，并在后续 UAC 提示中点击“是”。
+echo 脚本会尝试自动退出 Claude Desktop；如失败请手动关闭后再运行。
 echo.
 
 set "REPO=javaht/claude-desktop-zh-cn"

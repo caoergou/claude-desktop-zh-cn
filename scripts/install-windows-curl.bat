@@ -7,7 +7,7 @@ echo   Claude Desktop 中文补丁 - Windows 一键安装
 echo ==========================================
 echo.
 echo 本脚本会自动下载并安装：简体中文 + Cowork 兼容模式。
-echo 请确保已退出 Claude Desktop。
+echo 脚本会尝试自动退出 Claude Desktop；如失败请手动关闭后再运行。
 echo.
 pause
 

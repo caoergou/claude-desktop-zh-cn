@@ -1,5 +1,5 @@
 #!/bin/bash
-# Claude Desktop 中文补丁 - macOS 傻瓜版
+# Claude Desktop 中文补丁 - macOS 简易版
 # 双击即安装：简体中文 + Cowork 兼容模式（最安全，不修改 app.asar）
 set -euo pipefail
 

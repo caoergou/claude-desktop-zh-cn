@@ -28,7 +28,7 @@
 
 ## 快速安装
 
-### 推荐方式：傻瓜版（最简单）
+### 推荐方式：简易版（最简单）
 
 | 系统 | 下载文件 | 运行方式 |
 | :--- | :--- | :--- |
@@ -37,7 +37,7 @@
 
 👉 下载地址：[Latest Release](https://github.com/caoergou/claude-desktop-zh-cn/releases/latest)
 
-> 傻瓜版会自动安装：**简体中文 + Cowork 兼容模式**，全程不需要选择。
+> 简易版会自动安装：**简体中文 + Cowork 兼容模式**，全程不需要选择。
 > 这是最安全的模式，不会破坏 Windows 签名，适合绝大多数用户。
 
 ### 我需要其他语言或模式怎么办？
@@ -110,10 +110,10 @@ irm https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/i
 
 ### 安装前必读
 
-1. **完全退出 Claude Desktop**（包括菜单栏 / 托盘图标）。
-2. 如需 Cowork / 截图工作区，请使用 **傻瓜版** 或 **Cowork 兼容模式**。
+1. 脚本会尝试自动退出 Claude Desktop；如果退出失败，请手动关闭（包括菜单栏 / 托盘图标）后再运行。
+2. 如需 Cowork / 截图工作区，请使用 **简易版** 或 **Cowork 兼容模式**。
 
-### 傻瓜版（推荐）
+### 简易版（推荐）
 
 #### macOS
 
@@ -168,7 +168,7 @@ irm https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/i
 
 ## 安装模式说明
 
-> 使用**傻瓜版**的用户可以跳过本节，傻瓜版已默认使用最安全的 Cowork 兼容模式。
+> 使用**简易版**的用户可以跳过本节，简易版已默认使用最安全的 Cowork 兼容模式。
 
 ### Cowork 兼容模式
 
@@ -226,8 +226,8 @@ irm https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/i
 
 | 文件 | 说明 |
 | :--- | :--- |
-| `install-mac-simple.command` | macOS 傻瓜版入口：双击自动安装 |
-| `install-windows-simple.bat` | Windows 傻瓜版入口：右键管理员运行自动安装 |
+| `install-mac-simple.command` | macOS 简易版入口：双击自动安装 |
+| `install-windows-simple.bat` | Windows 简易版入口：右键管理员运行自动安装 |
 | `install-mac.command` | macOS 高级版入口（可选择语言 / 模式） |
 | `install-windows.bat` | Windows 高级版入口（可选择语言 / 模式） |
 | `scripts/install-mac-curl.sh` | macOS 命令行一键安装脚本 |
