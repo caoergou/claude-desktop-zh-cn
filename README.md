@@ -22,7 +22,7 @@
 - [功能特点](#功能特点)
 - [适用环境](#适用环境)
 - [安装说明](#安装说明)
-- [安装模式说明](#安装模式说明)
+- [安装模式怎么选](#安装模式怎么选)
 - [卸载 / 恢复](#卸载--恢复)
 - [常见问题](#常见问题)
 - [文件说明](#文件说明)
@@ -165,24 +165,43 @@ powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.c
 
 ---
 
-## 安装模式说明
+## 安装模式怎么选
 
-> 使用推荐版可以跳过本节，推荐版已默认使用 Cowork 兼容模式。
+> 使用**推荐版**的用户不用看这里，推荐版已经自动帮你选了最稳的模式。
 
-### Cowork 兼容模式
+### 一句话结论
 
-- **macOS 选项 `2` / Windows 模式 `1`**
-- 不修改 `app.asar`，不会破坏 Windows 下 `Claude.exe` 的 Authenticode 签名。
-- 适合需要使用 **Cowork 沙箱 / 截图工作区** 的用户。
-- 第三方模型名（如 `deepseek-v4-pro`、`kimi-*`）不会触发本地 Anthropic 校验失败。
-- 如需使用第三方模型，请在网关或 ccswitch 中做模型别名映射。
+| 你用不用 Cowork / 截图工作区？ | 选这个 |
+| :--- | :--- |
+| **用**（公司/学校要求的安全桌面环境） | **Cowork 兼容模式** |
+| **不用**（普通个人使用） | **官方账号登录模式**，汉化更完整 |
 
-### 官方账号登录模式
+### Cowork 兼容模式（安全优先）
 
-- **macOS 选项 `1` / Windows 模式 `2`**
-- 会修改 `app.asar`，向在线 `claude.ai` 页面注入 DOM 翻译。
-- 聊天、项目、Artifacts 等远程页面会显示中文。
-- Windows 下会改写 `Claude.exe` 内嵌的 asar 完整性哈希，导致 Authenticode 签名 `HashMismatch`；Cowork VM 服务可能拒绝客户端并报 `RPC pipe closed`。
+**对应菜单：** macOS 选 `2` / Windows 选 `1`
+
+- 只改 Claude 能识别的“皮肤层”文件，不动核心程序包。
+- Windows 下不会破坏 Claude 的数字签名，所以 **Cowork 沙箱、截图工作区、企业环境** 能正常通过安全校验。
+- 代价：网页版 Claude（聊天、项目、Artifacts 页面）的汉化会少一点。
+
+**如果你不确定该选哪个，先选这个。**
+
+### 官方账号登录模式（汉化更完整）
+
+**对应菜单：** macOS 选 `1` / Windows 选 `2`
+
+- 会深入修改 Claude 的核心程序包，让网页版 Claude 的聊天、项目、Artifacts 等页面也显示中文。
+- Windows 下会改变 Claude.exe 的签名校验信息，**Cowork / 截图工作区可能打不开或报错**。
+- 适合普通家庭用户，不用 Cowork 环境。
+
+### 第三方模型名说明
+
+如果你用 `deepseek-v4-pro`、`kimi-*` 这类非 Claude 官方模型：
+
+- **Cowork 兼容模式**：需要靠你的网关或 ccswitch 把模型名映射成 Claude/Anthropic 风格，否则 Claude 可能会拒绝。
+- **官方账号登录模式**：本补丁会绕过 Claude 的本地模型名校验，第三方模型名可以直接用。
+
+简单记：**要安全 / 用 Cowork → 模式 1；要汉化全 / 不用 Cowork → 模式 2**。
 
 ---
 
