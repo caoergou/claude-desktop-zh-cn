@@ -52,7 +52,7 @@
 ### 命令行用户
 
 <details>
-<summary>点击展开命令行方式</summary>
+<summary>点击展开命令行方式（同样使用傻瓜配置）</summary>
 
 #### macOS
 
@@ -167,6 +167,8 @@ irm https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/i
 ---
 
 ## 安装模式说明
+
+> 使用**傻瓜版**的用户可以跳过本节，傻瓜版已默认使用最安全的 Cowork 兼容模式。
 
 ### Cowork 兼容模式
 
