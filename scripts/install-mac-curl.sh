@@ -1,14 +1,6 @@
 #!/bin/bash
 # 一键下载完整安装包并运行（macOS）
 # 适合希望自主选择语言和模式的用户。
-#
-# 用法：
-#   curl -fsSL https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/install-mac-curl.sh | bash
-#
-# 环境变量（可选，用于自动化）：
-#   CLAUDE_ZH_VERSION=1.3.8     安装指定版本，默认 latest
-#   CLAUDE_LANG=zh-CN           默认语言：zh-CN | zh-TW | zh-HK
-#   CLAUDE_SKIP_ASAR_PATCH=1    1=Cowork 兼容模式，0=官方账号登录模式
 
 set -euo pipefail
 
@@ -38,11 +30,5 @@ if [ ! -x install-mac.command ]; then
   chmod +x install-mac.command
 fi
 
-# 如果用户通过环境变量指定了配置，则透传；否则进入交互式菜单。
-if [ -n "${CLAUDE_LANG:-}" ] || [ -n "${CLAUDE_SKIP_ASAR_PATCH:-}" ]; then
-  export CLAUDE_ACTION=install
-  export CLAUDE_LANG="${CLAUDE_LANG:-zh-CN}"
-  export CLAUDE_SKIP_ASAR_PATCH="${CLAUDE_SKIP_ASAR_PATCH:-1}"
-fi
-
+# 启动交互式安装向导，让用户自主选择语言和模式。
 exec ./install-mac.command "$@"

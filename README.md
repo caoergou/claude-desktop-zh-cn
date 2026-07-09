@@ -90,20 +90,6 @@ irm https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/i
 powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/install-windows-curl.ps1 | iex"
 ```
 
-#### 想跳过选择，直接安装？
-
-命令行也支持通过环境变量自动化：
-
-```bash
-# macOS：简体中文 + Cowork 兼容模式
-CLAUDE_LANG=zh-CN CLAUDE_SKIP_ASAR_PATCH=1 curl -fsSL ... | bash
-```
-
-```powershell
-# Windows：繁体中文 + 官方账号登录模式
-$env:CLAUDE_ZH_LANGUAGE='zh-TW'; $env:CLAUDE_ZH_PATCH_MODE='official'; irm ... | iex
-```
-
 </details>
 
 ---
