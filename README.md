@@ -68,6 +68,8 @@
 <details>
 <summary>点击展开命令行安装方式</summary>
 
+命令行方式会下载**完整安装包**并启动安装向导，**可以自主选择语言和安装模式**。
+
 #### macOS
 
 ```bash
@@ -88,16 +90,19 @@ irm https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/i
 powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/install-windows-curl.ps1 | iex"
 ```
 
-#### 想换语言或模式？
+#### 想跳过选择，直接安装？
 
-命令行一键命令默认使用**简体中文 + Cowork 兼容模式**，这样复制粘贴就能用。
+命令行也支持通过环境变量自动化：
 
-如果你需要其他语言或模式，建议下载完整安装包，解压后运行：
+```bash
+# macOS：简体中文 + Cowork 兼容模式
+CLAUDE_LANG=zh-CN CLAUDE_SKIP_ASAR_PATCH=1 curl -fsSL ... | bash
+```
 
-- macOS：双击 `install-mac.command`
-- Windows：右键 `install-windows.bat` → 以管理员身份运行
-
-然后按 `1/2/3` 选择语言和模式即可。
+```powershell
+# Windows：繁体中文 + 官方账号登录模式
+$env:CLAUDE_ZH_LANGUAGE='zh-TW'; $env:CLAUDE_ZH_PATCH_MODE='official'; irm ... | iex
+```
 
 </details>
 
