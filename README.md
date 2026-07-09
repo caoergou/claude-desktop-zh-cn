@@ -4,8 +4,13 @@
 [![Latest Release](https://img.shields.io/github/v/release/caoergou/claude-desktop-zh-cn)](https://github.com/caoergou/claude-desktop-zh-cn/releases/latest)
 [![GitHub Downloads](https://img.shields.io/github/downloads/caoergou/claude-desktop-zh-cn/total)](https://github.com/caoergou/claude-desktop-zh-cn/releases)
 
-> 为 Claude Desktop 提供简体中文、繁体中文（中国台湾）、繁体中文（中国香港）界面汉化。
-> 支持 API 与官方订阅；第三方 API 配置请参见 https://linux.do/topic/2032192。
+为 Claude Desktop 提供中文界面汉化，支持：
+
+- 简体中文（`zh-CN`）
+- 繁体中文（中国台湾，`zh-TW`）
+- 繁体中文（中国香港，`zh-HK`）
+
+支持 API 与官方订阅；如需使用第三方 API，请先参考 https://linux.do/topic/2032192 进行配置。
 
 <img src="docs/images/claude-desktop-zh-cn-home.png" alt="Claude Desktop 中文界面截图" width="640">
 
@@ -13,10 +18,10 @@
 
 ## 目录
 
-- [快速安装](#快速安装)
+- [快速开始](#快速开始)
 - [功能特点](#功能特点)
 - [适用环境](#适用环境)
-- [使用方式](#使用方式)
+- [安装说明](#安装说明)
 - [安装模式说明](#安装模式说明)
 - [卸载 / 恢复](#卸载--恢复)
 - [常见问题](#常见问题)
@@ -26,33 +31,42 @@
 
 ---
 
-## 快速安装
+## 快速开始
 
-### 推荐方式：简易版（最简单）
+### 第一步：下载安装脚本
 
-| 系统 | 下载文件 | 运行方式 |
+前往 [Latest Release](https://github.com/caoergou/claude-desktop-zh-cn/releases/latest)，下载对应系统的文件：
+
+| 系统 | 推荐下载 | 如何使用 |
 | :--- | :--- | :--- |
 | **macOS** | `install-mac-simple.command` | 双击运行 |
 | **Windows** | `install-windows-simple.bat` | 右键 → **以管理员身份运行** |
 
-👉 下载地址：[Latest Release](https://github.com/caoergou/claude-desktop-zh-cn/releases/latest)
+> **推荐版**会默认安装：**简体中文 + Cowork 兼容模式**，全程无需选择，适合绝大多数用户。
 
-> 简易版会自动安装：**简体中文 + Cowork 兼容模式**，全程不需要选择。
-> 这是最安全的模式，不会破坏 Windows 签名，适合绝大多数用户。
+### 第二步：等待完成
 
-### 我需要其他语言或模式怎么办？
+脚本会自动完成以下操作：
 
-下载完整安装包，解压后运行：
+1. 尝试退出 Claude Desktop（如失败会提示你手动关闭）。
+2. 下载并应用中文补丁。
+3. 重启 Claude Desktop 并切换到简体中文。
+
+整个过程一般只需几十秒。
+
+### 需要其他语言或模式？
+
+下载完整安装包 `claude-desktop-zh-cn-mac.zip` / `claude-desktop-zh-cn-windows.zip`，解压后运行：
 
 - macOS：双击 `install-mac.command`
 - Windows：右键 `install-windows.bat` → 以管理员身份运行
 
-然后按提示选择语言（简体中文 / 繁体中文台湾 / 繁体中文香港）和安装模式。
+然后按提示选择语言和安装模式即可。
 
-### 命令行用户
+### 喜欢命令行？
 
 <details>
-<summary>点击展开命令行方式（同样使用傻瓜配置）</summary>
+<summary>点击展开命令行安装方式</summary>
 
 #### macOS
 
@@ -74,7 +88,7 @@ powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.c
 irm https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/install-windows-curl.ps1 | iex
 ```
 
-> 如果提示执行策略限制，可先运行 `Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process`。
+> 命令行方式同样使用推荐配置：简体中文 + Cowork 兼容模式。
 
 </details>
 
@@ -82,16 +96,16 @@ irm https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/i
 
 ## 功能特点
 
-- ✅ 支持三种中文变体：`zh-CN`（简体中文）、`zh-TW`（繁体中文（中国台湾））、`zh-HK`（繁体中文（中国香港））。
-- ✅ 自动将所选中文加入 Claude 前端语言白名单。
-- ✅ macOS 自动合并当前 Claude 版本的 `en-US.json` 与随包中文翻译，新增未翻译字段保留英文，避免缺字。
-- ✅ 提供 **Cowork 兼容模式**，不修改 `app.asar`，不破坏 Windows 签名，适合需要使用 Cowork 沙箱 / 截图工作区的用户。
-- ✅ 提供 **官方账号登录模式**，注入在线 `claude.ai` 页面 DOM 翻译，聊天、项目、Artifacts 等页面显示中文。
-- ✅ macOS 可绕过新版 Claude Desktop 对 3P gateway 模型名的本地 Anthropic 校验。
-- ✅ 安装前自动备份原始文件，卸载时可一键恢复。
-- ✅ 自动写入 Claude 用户配置，将语言设置为所选中文变体。
-- ✅ 支持同步 / 取消同步 CC Switch skills。
-- ✅ 支持一键禁止 / 允许 Claude Desktop 自动更新。
+- 支持三种中文变体：`zh-CN`、`zh-TW`、`zh-HK`。
+- 自动将中文加入 Claude 前端语言白名单。
+- macOS 自动合并当前 Claude 版本的 `en-US.json` 与中文翻译，新增未翻译字段保留英文。
+- 提供 **Cowork 兼容模式**：不修改 `app.asar`，不破坏 Windows 签名。
+- 提供 **官方账号登录模式**：在线 `claude.ai` 页面 DOM 翻译，聊天、项目、Artifacts 等显示中文。
+- macOS 可绕过新版 Claude Desktop 对第三方 gateway 模型名的本地校验。
+- 安装前自动备份，卸载时可一键恢复。
+- 自动写入 Claude 用户配置，设置语言为所选中文变体。
+- 支持同步 / 取消同步 CC Switch skills。
+- 支持一键禁止 / 允许 Claude Desktop 自动更新。
 
 ---
 
@@ -106,61 +120,46 @@ irm https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/i
 
 ---
 
-## 使用方式
+## 安装说明
 
-### 安装前必读
+### 安装前
 
-1. 脚本会尝试自动退出 Claude Desktop；如果退出失败，请手动关闭（包括菜单栏 / 托盘图标）后再运行。
-2. 如需 Cowork / 截图工作区，请使用 **简易版** 或 **Cowork 兼容模式**。
+- 脚本会尝试自动退出 Claude Desktop；如果退出失败，请手动关闭（包括菜单栏 / 托盘图标）后再运行。
+- 如需使用 **Cowork 沙箱 / 截图工作区**，请使用推荐版或手动选择 **Cowork 兼容模式**。
 
-### 简易版（推荐）
+### macOS
 
-#### macOS
-
-1. 到 [Latest Release](https://github.com/caoergou/claude-desktop-zh-cn/releases/latest) 下载 `install-mac-simple.command`。
+1. 下载 `install-mac-simple.command`。
 2. 双击运行。
-3. 按提示输入 Mac 登录密码，等待完成。
-4. Claude 会自动重启并切换到简体中文。
+3. 按提示输入 Mac 登录密码。
+4. 等待 Claude 自动重启并切换为简体中文。
 
-#### Windows
+### Windows
 
-1. 到 [Latest Release](https://github.com/caoergou/claude-desktop-zh-cn/releases/latest) 下载 `install-windows-simple.bat`。
+1. 下载 `install-windows-simple.bat`。
 2. 右键该文件 → **以管理员身份运行**。
 3. 等待窗口提示完成。
-4. Claude 会自动重启并切换到简体中文。
+4. Claude 会自动重启并切换为简体中文。
 
-### 高级版（需要选择语言或模式）
+### 高级选项
 
 <details>
-<summary>点击展开高级版使用说明</summary>
+<summary>需要选择语言或安装模式？点击展开</summary>
 
-#### macOS
+下载完整安装包并解压后运行：
 
-1. 下载完整安装包 `claude-desktop-zh-cn-mac.zip` 并解压。
-2. 双击 `install-mac.command`。
-3. 按菜单选择操作：
-   - `1` 安装中文补丁（官方账号登录模式）
-   - `2` 安装中文补丁（Cowork 兼容模式）
-   - `3` 恢复原样 / 卸载补丁
-   - `4` 禁止 / 允许自动更新
-   - `5` 同步 / 取消同步 CC Switch skills
-4. 选择语言：`1` 简体中文、`2` 繁体中文（中国台湾）、`3` 繁体中文（中国香港）。
-5. 按提示输入 Mac 登录密码。
-6. Claude 会自动重启；如未自动切换语言，点击左下角账号菜单 → `Language` → 选择对应中文。
+- macOS：双击 `install-mac.command`
+- Windows：右键 `install-windows.bat` → 以管理员身份运行
 
-#### Windows
+按菜单选择：
 
-1. 下载完整安装包 `claude-desktop-zh-cn-windows.zip` 并解压。
-2. 右键 `install-windows.bat` → **以管理员身份运行**。
-3. 按菜单选择操作：
-   - `1` 安装中文补丁（Cowork 兼容模式）
-   - `2` 安装中文补丁（官方账号登录模式）
-   - `3` 恢复原样 / 卸载补丁
-   - `4` 禁止 / 允许自动更新
-   - `5` 同步 / 取消同步 CC Switch skills
-4. 选择语言：`1` 简体中文、`2` 繁体中文（中国台湾）、`3` 繁体中文（中国香港）。
-5. 脚本会备份资源、写入中文 JSON、汉化硬编码文本并重启 Claude Desktop。
-6. 如未自动切换语言，点击左下角账号菜单 → `Language` → 选择对应中文。
+- `1` 安装中文补丁（官方账号登录模式）
+- `2` 安装中文补丁（Cowork 兼容模式）
+- `3` 恢复原样 / 卸载补丁
+- `4` 禁止 / 允许自动更新
+- `5` 同步 / 取消同步 CC Switch skills
+
+然后选择语言：`1` 简体中文、`2` 繁体中文（中国台湾）、`3` 繁体中文（中国香港）。
 
 </details>
 
@@ -168,12 +167,12 @@ irm https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/i
 
 ## 安装模式说明
 
-> 使用**简易版**的用户可以跳过本节，简易版已默认使用最安全的 Cowork 兼容模式。
+> 使用推荐版可以跳过本节，推荐版已默认使用 Cowork 兼容模式。
 
 ### Cowork 兼容模式
 
 - **macOS 选项 `2` / Windows 模式 `1`**
-- 不修改 `app.asar`，因此不会破坏 Windows 下 `Claude.exe` 的 Authenticode 签名。
+- 不修改 `app.asar`，不会破坏 Windows 下 `Claude.exe` 的 Authenticode 签名。
 - 适合需要使用 **Cowork 沙箱 / 截图工作区** 的用户。
 - 第三方模型名（如 `deepseek-v4-pro`、`kimi-*`）不会触发本地 Anthropic 校验失败。
 - 如需使用第三方模型，请在网关或 ccswitch 中做模型别名映射。
@@ -189,10 +188,10 @@ irm https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/i
 
 ## 卸载 / 恢复
 
-重新运行安装脚本，选择恢复即可：
+重新运行完整安装包中的脚本：
 
-- macOS：选择 `3`
-- Windows：选择 `3`
+- macOS：双击 `install-mac.command`，选择 `3`
+- Windows：右键 `install-windows.bat` → 以管理员身份运行，选择 `3`
 
 ---
 
@@ -208,7 +207,7 @@ irm https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/i
 
 ### 安装后 Claude Desktop 没有变成中文
 
-1. 确认已完全退出 Claude Desktop（包括菜单栏 / 托盘图标）。
+1. 确认 Claude Desktop 已完全退出（包括菜单栏 / 托盘图标）。
 2. 打开左下角账号菜单 → `Language` → 选择对应中文变体。
 3. 若仍不生效，可能是 Claude 版本更新导致资源结构变化，请等待本项目更新或重新运行安装脚本。
 
@@ -226,10 +225,10 @@ irm https://raw.githubusercontent.com/javaht/claude-desktop-zh-cn/main/scripts/i
 
 | 文件 | 说明 |
 | :--- | :--- |
-| `install-mac-simple.command` | macOS 简易版入口：双击自动安装 |
-| `install-windows-simple.bat` | Windows 简易版入口：右键管理员运行自动安装 |
-| `install-mac.command` | macOS 高级版入口（可选择语言 / 模式） |
-| `install-windows.bat` | Windows 高级版入口（可选择语言 / 模式） |
+| `install-mac-simple.command` | macOS 推荐版：双击自动安装 |
+| `install-windows-simple.bat` | Windows 推荐版：右键管理员运行自动安装 |
+| `install-mac.command` | macOS 高级版：可选择语言 / 模式 |
+| `install-windows.bat` | Windows 高级版：可选择语言 / 模式 |
 | `scripts/install-mac-curl.sh` | macOS 命令行一键安装脚本 |
 | `scripts/install-windows-curl.bat` | Windows 命令行一键安装脚本 |
 | `scripts/install-windows-curl.ps1` | Windows 一键脚本核心 |
